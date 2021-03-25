@@ -24,9 +24,10 @@ the relevant captured outputs.
 
 # Documentation
 
-class `StreamCapture` is able to capture, at the operating system level, the data being
-written to a stream. A typical use is to capture all outputs to stdout and stderr
-and log it to a file. This will even capture the outputs of spawned shell commands.
+Class `StreamCapture(stream, writer, echo=True, monkeypatch=None)` is able to capture,
+at the operating system level, the data being written to the given `stream`.
+A typical use is to capture all outputs to `sys.stdout` and `sys.stderr`
+and log them to a file. This will even capture the outputs of spawned shell commands.
 
 `StreamCapture` works by essentially using `os.dup2` to send `stream.fileno()` to a `os.pipe()`.
 A separate thread is used to listen to that `os.pipe` and send the outputs to the destination

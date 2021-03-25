@@ -24,9 +24,10 @@ the relevant captured outputs.
 
 # Documentation
 
-class `StreamCapture` is able to capture, at the operating system level, the data being
-written to a stream. A typical use is to capture all outputs to stdout and stderr
-and log it to a file. This will even capture the outputs of spawned shell commands.
+Class `StreamCapture(stream, writer, echo=True, monkeypatch=None)` is able to capture,
+at the operating system level, the data being written to the given `stream`.
+A typical use is to capture all outputs to `sys.stdout` and `sys.stderr`
+and log them to a file. This will even capture the outputs of spawned shell commands.
 
 `StreamCapture` works by essentially using `os.dup2` to send `stream.fileno()` to a `os.pipe()`.
 A separate thread is used to listen to that `os.pipe` and send the outputs to the destination
@@ -74,16 +75,19 @@ One can call `StreamCapture.close()` to cleanly unwind the captured streams. Thi
 done if `StreamCapture` is used in a `with` block.
 """
 
-import os, sys, threading, time, platform
+import os, sys, threading, platform
 
 class StreamCapture:
 	def __init__(self,stream,writer,echo=True,monkeypatch=None):
 		"""
 		The `StreamCapture` constructor. Parameters are:
 
-		* `stream`: The stream to capture (e.g. `sys.stdout`)
+		* `stream`: The stream to capture (e.g. `sys.stdout`). This stream should be connected to an
+		            underlying `fileno()`.
 		* `writer`: The stream to write to (e.g. `writer=open('logfile.txt','wb'))`). If applicable, the
-		            `writer` stream should be opened in binary mode.
+		            `writer` stream should be opened in binary mode. This object need not be an actual
+		            Python stream; any object that implements functions `writer.write(data)` and 
+		            `writer.close()` is suitable here.
 		* `echo=True`: If `True`, send data to `StreamCapture.dup_fd` in addition to `StreamCapture.writer()`.
 		* `monkeypatch`: If `True`, replaces `stream.write(data)` with `os.write(fd,data)` (more or less).
 		               This is necessary on Windows for `stdout` and `stderr`.
