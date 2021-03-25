@@ -1,0 +1,12 @@
+*.pickle
+*.log
+*.txt
+*.egg-info
+*~
+*.orig
+__pycache__
+doc
+build
+dist
+.DS_Store
+.mark
