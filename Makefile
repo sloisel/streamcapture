@@ -25,5 +25,7 @@ dist: dist/.mark
 pypi: all
 	twine upload dist/*
 
-test:
+test/logfile.txt: test/test1.py streamcapture/__init__.py Makefile
 	cd test && ../scripts/python test1.py && diff logfile.txt logfile.gold
+
+test: test/logfile.txt

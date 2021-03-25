@@ -87,7 +87,12 @@ class StreamCapture:
 		* `writer`: The stream to write to (e.g. `writer=open('logfile.txt','wb'))`). If applicable, the
 		            `writer` stream should be opened in binary mode. This object need not be an actual
 		            Python stream; any object that implements functions `writer.write(data)` and 
-		            `writer.close()` is suitable here.
+		            `writer.close()` is suitable here. The only caveat is that `StreamCapture` will
+		            call into `writer` from a separate thread, so if `writer.write()` or `writer.close()`
+		            have significant side-effects, then one should make use of appropriate locking
+		            primitives. This is not necessary for plain-old files obtained from `open(...)`, but
+		            if a writer accumulates the outputs in an in-memory list, then one should use
+		            appropriate thread-safe locking to interact with this list from the main thread.
 		* `echo=True`: If `True`, send data to `StreamCapture.dup_fd` in addition to `StreamCapture.writer()`.
 		* `monkeypatch`: If `True`, replaces `stream.write(data)` with `os.write(fd,data)` (more or less).
 		               This is necessary on Windows for `stdout` and `stderr`.

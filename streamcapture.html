@@ -160,7 +160,7 @@ One can call `StreamCapture.close()` to cleanly unwind the captured streams. Thi
 done if `StreamCapture` is used in a `with` block.
 &#34;&#34;&#34;
 
-import os, sys, threading, time, platform
+import os, sys, threading, platform
 
 class StreamCapture:
         def __init__(self,stream,writer,echo=True,monkeypatch=None):
@@ -172,7 +172,12 @@ class StreamCapture:
                 * `writer`: The stream to write to (e.g. `writer=open(&#39;logfile.txt&#39;,&#39;wb&#39;))`). If applicable, the
                             `writer` stream should be opened in binary mode. This object need not be an actual
                             Python stream; any object that implements functions `writer.write(data)` and 
-                            `writer.close()` is suitable here.
+                            `writer.close()` is suitable here. The only caveat is that `StreamCapture` will
+                            call into `writer` from a separate thread, so if `writer.write()` or `writer.close()`
+                            have significant side-effects, then one should make use of appropriate locking
+                            primitives. This is not necessary for plain-old files obtained from `open(...)`, but
+                            if a writer accumulates the outputs in an in-memory list, then one should use
+                            appropriate thread-safe locking to interact with this list from the main thread.
                 * `echo=True`: If `True`, send data to `StreamCapture.dup_fd` in addition to `StreamCapture.writer()`.
                 * `monkeypatch`: If `True`, replaces `stream.write(data)` with `os.write(fd,data)` (more or less).
                                This is necessary on Windows for `stdout` and `stderr`.
@@ -246,7 +251,12 @@ underlying <code>fileno()</code>.</li>
 <li><code>writer</code>: The stream to write to (e.g. <code>writer=open('logfile.txt','wb'))</code>). If applicable, the
 <code>writer</code> stream should be opened in binary mode. This object need not be an actual
 Python stream; any object that implements functions <code>writer.write(data)</code> and
-<code>writer.close()</code> is suitable here.</li>
+<code>writer.close()</code> is suitable here. The only caveat is that <code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a></code> will
+call into <code>writer</code> from a separate thread, so if <code>writer.write()</code> or <code>writer.close()</code>
+have significant side-effects, then one should make use of appropriate locking
+primitives. This is not necessary for plain-old files obtained from <code>open(&hellip;)</code>, but
+if a writer accumulates the outputs in an in-memory list, then one should use
+appropriate thread-safe locking to interact with this list from the main thread.</li>
 <li><code>echo=True</code>: If <code>True</code>, send data to <code>StreamCapture.dup_fd</code> in addition to <code>StreamCapture.writer()</code>.</li>
 <li><code>monkeypatch</code>: If <code>True</code>, replaces <code>stream.write(data)</code> with <code>os.write(fd,data)</code> (more or less).
 This is necessary on Windows for <code>stdout</code> and <code>stderr</code>.
@@ -267,7 +277,12 @@ when Windows is detected via <code>platform.system()=='Windows'</code>.</li>
                 * `writer`: The stream to write to (e.g. `writer=open(&#39;logfile.txt&#39;,&#39;wb&#39;))`). If applicable, the
                             `writer` stream should be opened in binary mode. This object need not be an actual
                             Python stream; any object that implements functions `writer.write(data)` and 
-                            `writer.close()` is suitable here.
+                            `writer.close()` is suitable here. The only caveat is that `StreamCapture` will
+                            call into `writer` from a separate thread, so if `writer.write()` or `writer.close()`
+                            have significant side-effects, then one should make use of appropriate locking
+                            primitives. This is not necessary for plain-old files obtained from `open(...)`, but
+                            if a writer accumulates the outputs in an in-memory list, then one should use
+                            appropriate thread-safe locking to interact with this list from the main thread.
                 * `echo=True`: If `True`, send data to `StreamCapture.dup_fd` in addition to `StreamCapture.writer()`.
                 * `monkeypatch`: If `True`, replaces `stream.write(data)` with `os.write(fd,data)` (more or less).
                                This is necessary on Windows for `stdout` and `stderr`.
