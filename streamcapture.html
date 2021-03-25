@@ -165,11 +165,11 @@ class StreamCapture:
                 &#34;&#34;&#34;
                 The `StreamCapture` constructor. Parameters are:
 
-                `stream`: The stream to capture (e.g. `sys.stdout`)
-                `writer`: The stream to write to (e.g. `writer=open(&#39;logfile.txt&#39;,&#39;wb&#39;))`). If applicable, the
-                         `writer` stream should be opened in binary mode.
-                `echo=True`: If `True`, send data to `StreamCapture.dup_fd` in addition to `StreamCapture.writer()`.
-                `monkeypatch`: If `True`, replaces `stream.write(data)` with `os.write(fd,data)` (more or less).
+                * `stream`: The stream to capture (e.g. `sys.stdout`)
+                * `writer`: The stream to write to (e.g. `writer=open(&#39;logfile.txt&#39;,&#39;wb&#39;))`). If applicable, the
+                            `writer` stream should be opened in binary mode.
+                * `echo=True`: If `True`, send data to `StreamCapture.dup_fd` in addition to `StreamCapture.writer()`.
+                * `monkeypatch`: If `True`, replaces `stream.write(data)` with `os.write(fd,data)` (more or less).
                                This is necessary on Windows for `stdout` and `stderr`.
                                The default is to enable monkeypatching only
                                when Windows is detected via `platform.system()==&#39;Windows&#39;`.
@@ -235,14 +235,16 @@ class StreamCapture:
 </code></dt>
 <dd>
 <div class="desc"><p>The <code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a></code> constructor. Parameters are:</p>
-<p><code>stream</code>: The stream to capture (e.g. <code>sys.stdout</code>)
-<code>writer</code>: The stream to write to (e.g. <code>writer=open('logfile.txt','wb'))</code>). If applicable, the
-<code>writer</code> stream should be opened in binary mode.
-<code>echo=True</code>: If <code>True</code>, send data to <code>StreamCapture.dup_fd</code> in addition to <code>StreamCapture.writer()</code>.
-<code>monkeypatch</code>: If <code>True</code>, replaces <code>stream.write(data)</code> with <code>os.write(fd,data)</code> (more or less).
+<ul>
+<li><code>stream</code>: The stream to capture (e.g. <code>sys.stdout</code>)</li>
+<li><code>writer</code>: The stream to write to (e.g. <code>writer=open('logfile.txt','wb'))</code>). If applicable, the
+<code>writer</code> stream should be opened in binary mode.</li>
+<li><code>echo=True</code>: If <code>True</code>, send data to <code>StreamCapture.dup_fd</code> in addition to <code>StreamCapture.writer()</code>.</li>
+<li><code>monkeypatch</code>: If <code>True</code>, replaces <code>stream.write(data)</code> with <code>os.write(fd,data)</code> (more or less).
 This is necessary on Windows for <code>stdout</code> and <code>stderr</code>.
 The default is to enable monkeypatching only
-when Windows is detected via <code>platform.system()=='Windows'</code>.</p></div>
+when Windows is detected via <code>platform.system()=='Windows'</code>.</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -252,11 +254,11 @@ when Windows is detected via <code>platform.system()=='Windows'</code>.</p></div
                 &#34;&#34;&#34;
                 The `StreamCapture` constructor. Parameters are:
 
-                `stream`: The stream to capture (e.g. `sys.stdout`)
-                `writer`: The stream to write to (e.g. `writer=open(&#39;logfile.txt&#39;,&#39;wb&#39;))`). If applicable, the
-                         `writer` stream should be opened in binary mode.
-                `echo=True`: If `True`, send data to `StreamCapture.dup_fd` in addition to `StreamCapture.writer()`.
-                `monkeypatch`: If `True`, replaces `stream.write(data)` with `os.write(fd,data)` (more or less).
+                * `stream`: The stream to capture (e.g. `sys.stdout`)
+                * `writer`: The stream to write to (e.g. `writer=open(&#39;logfile.txt&#39;,&#39;wb&#39;))`). If applicable, the
+                            `writer` stream should be opened in binary mode.
+                * `echo=True`: If `True`, send data to `StreamCapture.dup_fd` in addition to `StreamCapture.writer()`.
+                * `monkeypatch`: If `True`, replaces `stream.write(data)` with `os.write(fd,data)` (more or less).
                                This is necessary on Windows for `stdout` and `stderr`.
                                The default is to enable monkeypatching only
                                when Windows is detected via `platform.system()==&#39;Windows&#39;`.

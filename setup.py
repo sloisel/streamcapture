@@ -16,7 +16,7 @@ setup(
     zip_safe=False,
     url='https://github.com/sloisel/streamcapture',
     project_urls={
-        'Documentation': 'https://htmlpreview.github.io/?https://github.com/sloisel/streamcapture/blob/master/pyptex.html',
+        'Documentation': 'https://htmlpreview.github.io/?https://github.com/sloisel/streamcapture/blob/master/streamcapture.html',
         'Source': 'https://github.com/sloisel/streamcapture',
     },
     license='MIT',

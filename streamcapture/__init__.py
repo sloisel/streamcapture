@@ -81,11 +81,11 @@ class StreamCapture:
 		"""
 		The `StreamCapture` constructor. Parameters are:
 
-		`stream`: The stream to capture (e.g. `sys.stdout`)
-		`writer`: The stream to write to (e.g. `writer=open('logfile.txt','wb'))`). If applicable, the
-		         `writer` stream should be opened in binary mode.
-		`echo=True`: If `True`, send data to `StreamCapture.dup_fd` in addition to `StreamCapture.writer()`.
-		`monkeypatch`: If `True`, replaces `stream.write(data)` with `os.write(fd,data)` (more or less).
+		* `stream`: The stream to capture (e.g. `sys.stdout`)
+		* `writer`: The stream to write to (e.g. `writer=open('logfile.txt','wb'))`). If applicable, the
+		            `writer` stream should be opened in binary mode.
+		* `echo=True`: If `True`, send data to `StreamCapture.dup_fd` in addition to `StreamCapture.writer()`.
+		* `monkeypatch`: If `True`, replaces `stream.write(data)` with `os.write(fd,data)` (more or less).
 		               This is necessary on Windows for `stdout` and `stderr`.
 		               The default is to enable monkeypatching only
 		               when Windows is detected via `platform.system()=='Windows'`.
