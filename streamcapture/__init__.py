@@ -109,7 +109,7 @@ class StreamCapture:
 		self.pipe_write_fd = w
 		self.dup_fd = os.dup(self.fd)
 		os.dup2(w,self.fd)
-		self.monkeypatch = monkeypatch if monkeypatch is not None else (True if platform.system()=='Windows' else False)
+		self.monkeypatch = monkeypatch if monkeypatch is not None else platform.system()=='Windows'
 		if self.monkeypatch:
 			self.oldwrite = stream.write
 			stream.write = lambda z: os.write(self.fd,z.encode() if type(z)==str else z)
@@ -118,9 +118,8 @@ class StreamCapture:
 		t.start()
 	def printer(self):
 		"""This is the thread that listens to the pipe output and passes it to the writer stream."""
-		pipe_read_fd = self.pipe_read_fd
 		while True:
-			data = os.read(pipe_read_fd,100000)
+			data = os.read(self.pipe_read_fd,100000)
 			if(len(data)==0):
 				self.writer.close()
 				os.close(self.dup_fd)

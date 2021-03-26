@@ -194,7 +194,7 @@ class StreamCapture:
                 self.pipe_write_fd = w
                 self.dup_fd = os.dup(self.fd)
                 os.dup2(w,self.fd)
-                self.monkeypatch = monkeypatch if monkeypatch is not None else (True if platform.system()==&#39;Windows&#39; else False)
+                self.monkeypatch = monkeypatch if monkeypatch is not None else platform.system()==&#39;Windows&#39;
                 if self.monkeypatch:
                         self.oldwrite = stream.write
                         stream.write = lambda z: os.write(self.fd,z.encode() if type(z)==str else z)
@@ -203,9 +203,8 @@ class StreamCapture:
                 t.start()
         def printer(self):
                 &#34;&#34;&#34;This is the thread that listens to the pipe output and passes it to the writer stream.&#34;&#34;&#34;
-                pipe_read_fd = self.pipe_read_fd
                 while True:
-                        data = os.read(pipe_read_fd,100000)
+                        data = os.read(self.pipe_read_fd,100000)
                         if(len(data)==0):
                                 self.writer.close()
                                 os.close(self.dup_fd)
@@ -299,7 +298,7 @@ when Windows is detected via <code>platform.system()=='Windows'</code>.</li>
                 self.pipe_write_fd = w
                 self.dup_fd = os.dup(self.fd)
                 os.dup2(w,self.fd)
-                self.monkeypatch = monkeypatch if monkeypatch is not None else (True if platform.system()==&#39;Windows&#39; else False)
+                self.monkeypatch = monkeypatch if monkeypatch is not None else platform.system()==&#39;Windows&#39;
                 if self.monkeypatch:
                         self.oldwrite = stream.write
                         stream.write = lambda z: os.write(self.fd,z.encode() if type(z)==str else z)
@@ -308,9 +307,8 @@ when Windows is detected via <code>platform.system()=='Windows'</code>.</li>
                 t.start()
         def printer(self):
                 &#34;&#34;&#34;This is the thread that listens to the pipe output and passes it to the writer stream.&#34;&#34;&#34;
-                pipe_read_fd = self.pipe_read_fd
                 while True:
-                        data = os.read(pipe_read_fd,100000)
+                        data = os.read(self.pipe_read_fd,100000)
                         if(len(data)==0):
                                 self.writer.close()
                                 os.close(self.dup_fd)
@@ -368,9 +366,8 @@ when Windows is detected via <code>platform.system()=='Windows'</code>.</li>
 </summary>
 <pre><code class="python">def printer(self):
         &#34;&#34;&#34;This is the thread that listens to the pipe output and passes it to the writer stream.&#34;&#34;&#34;
-        pipe_read_fd = self.pipe_read_fd
         while True:
-                data = os.read(pipe_read_fd,100000)
+                data = os.read(self.pipe_read_fd,100000)
                 if(len(data)==0):
                         self.writer.close()
                         os.close(self.dup_fd)
