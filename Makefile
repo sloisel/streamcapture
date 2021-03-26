@@ -8,7 +8,8 @@ streamcapture.html: streamcapture/__init__.py
 	rm -rf html
 
 README.md: streamcapture/__init__.py
-	python3 -c 'import streamcapture; print(streamcapture.__doc__)' > README.md
+	pdoc . > README.md
+#	python3 -c 'import streamcapture; print(streamcapture.__doc__)' > README.md
 
 clean:
 	rm -rf html streamcapture.egg-info dist build

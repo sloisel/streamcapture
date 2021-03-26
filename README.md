@@ -1,4 +1,5 @@
-
+Module streamcapture
+====================
 ## streamcapture: capture the outputs of Python streams, such as sys.stdout and sys.stderr
 
 ### Author: Sébastien Loisel
@@ -74,3 +75,33 @@ similar to the `tee` console command in Unix. The `echo` flag can be set to `Fal
 One can call `StreamCapture.close()` to cleanly unwind the captured streams. This is automatically
 done if `StreamCapture` is used in a `with` block.
 
+Classes
+-------
+
+`StreamCapture(stream, writer, echo=True, monkeypatch=None)`
+:   The `StreamCapture` constructor. Parameters are:
+    
+    * `stream`: The stream to capture (e.g. `sys.stdout`). This stream should be connected to an
+                underlying `fileno()`.
+    * `writer`: The stream to write to (e.g. `writer=open('logfile.txt','wb'))`). If applicable, the
+                `writer` stream should be opened in binary mode. This object need not be an actual
+                Python stream; any object that implements functions `writer.write(data)` and 
+                `writer.close()` is suitable here. The only caveat is that `StreamCapture` will
+                call into `writer` from a separate thread, so if `writer.write()` or `writer.close()`
+                have significant side-effects, then one should make use of appropriate locking
+                primitives. This is not necessary for plain-old files obtained from `open(...)`, but
+                if a writer accumulates the outputs in an in-memory list, then one should use
+                appropriate thread-safe locking to interact with this list from the main thread.
+    * `echo=True`: If `True`, send data to `StreamCapture.dup_fd` in addition to `StreamCapture.writer()`.
+    * `monkeypatch`: If `True`, replaces `stream.write(data)` with `os.write(fd,data)` (more or less).
+                   This is necessary on Windows for `stdout` and `stderr`.
+                   The default is to enable monkeypatching only
+                   when Windows is detected via `platform.system()=='Windows'`.
+
+    ### Methods
+
+    `close(self)`
+    :   When you want to "uncapture" a stream, use this method.
+
+    `printer(self)`
+    :   This is the thread that listens to the pipe output and passes it to the writer stream.
