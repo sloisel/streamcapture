@@ -120,9 +120,9 @@ class StreamCapture:
 				if self.echo:
 					os.write(self.dup_fd,data)
 		finally:
-				self.writer.close()
-				os.close(self.dup_fd)
-				os.close(self.pipe_read_fd)
+			self.writer.close()
+			os.close(self.dup_fd)
+			os.close(self.pipe_read_fd)
 	def close(self):
 		"""When you want to "uncapture" a stream, use this method."""
 		if not self.active:
