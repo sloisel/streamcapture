@@ -51,10 +51,10 @@ For example, when redirecting <code>sys.stdout</code>, one can still write to th
 to <code>StreamCapture.dup_fd</code> with <code>os.write()</code>.</p>
 <p>On Windows, <code>sys.stdout</code> and <code>sys.stderr</code> do not take kindly to their <code>fileno()</code> being
 redirected with <code>os.dup2</code>. <code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a></code> features an optional workaround, enabled by the
-<code>monkeypatching</code> optional parameter to the constructor. When enabled, the workaround
+<code>monkeypatch</code> optional parameter to the constructor. When enabled, the workaround
 overwrites <code>stream.write(&hellip;)</code> by an implementation that sends everything to <code>os.write(self.fd,&hellip;)</code>.
-This workaround is enabled when <code>monkeypatching=True</code> and disabled when <code>monkeypatching=False</code>.
-The default is <code>monkeypatching=None</code>, in which case monkeypatching is enabled only when
+This workaround is enabled when <code>monkeypatch=True</code> and disabled when <code>monkeypatch=False</code>.
+The default is <code>monkeypatch=None</code>, in which case monkeypatching is enabled only when
 <code>platform.system()=='Windows'</code>.</p>
 <p>When writing to multiple streams and file descriptors, sometimes the order in which the writes
 appear can be surprising. For example, when writing to stderr and stdout, these outputs do not
@@ -124,10 +124,10 @@ to `StreamCapture.dup_fd` with `os.write()`.
 
 On Windows, `sys.stdout` and `sys.stderr` do not take kindly to their `fileno()` being
 redirected with `os.dup2`. `StreamCapture` features an optional workaround, enabled by the
-`monkeypatching` optional parameter to the constructor. When enabled, the workaround
+`monkeypatch` optional parameter to the constructor. When enabled, the workaround
 overwrites `stream.write(...)` by an implementation that sends everything to `os.write(self.fd,...)`.
-This workaround is enabled when `monkeypatching=True` and disabled when `monkeypatching=False`.
-The default is `monkeypatching=None`, in which case monkeypatching is enabled only when 
+This workaround is enabled when `monkeypatch=True` and disabled when `monkeypatch=False`.
+The default is `monkeypatch=None`, in which case monkeypatching is enabled only when 
 `platform.system()==&#39;Windows&#39;`.
 
 When writing to multiple streams and file descriptors, sometimes the order in which the writes
@@ -184,23 +184,16 @@ class StreamCapture:
                                The default is to enable monkeypatching only
                                when Windows is detected via `platform.system()==&#39;Windows&#39;`.
                 &#34;&#34;&#34;
-                self.active = True
-                self.writer = writer
-                self.stream = stream
-                self.fd = stream.fileno()
-                self.echo = echo
-                (r,w) = os.pipe()
-                self.pipe_read_fd = r
-                self.pipe_write_fd = w
-                self.dup_fd = os.dup(self.fd)
-                os.dup2(w,self.fd)
+                (self.active, self.writer, self.stream, self.echo) = (True,writer,stream,echo)
+                (self.pipe_read_fd, self.pipe_write_fd) = os.pipe()
+                self.dup_fd = os.dup(stream.fileno())
+                os.dup2(self.pipe_write_fd,stream.fileno())
                 self.monkeypatch = monkeypatch if monkeypatch is not None else platform.system()==&#39;Windows&#39;
                 if self.monkeypatch:
                         self.oldwrite = stream.write
-                        stream.write = lambda z: os.write(self.fd,z.encode() if type(z)==str else z)
-                t = threading.Thread(target=self.printer)
-                self.thread = t
-                t.start()
+                        stream.write = lambda z: os.write(stream.fileno(),z.encode() if hasattr(z,&#39;encode&#39;) else z)
+                self.thread = threading.Thread(target=self.printer)
+                self.thread.start()
         def printer(self):
                 &#34;&#34;&#34;This is the thread that listens to the pipe output and passes it to the writer stream.&#34;&#34;&#34;
                 while True:
@@ -221,7 +214,7 @@ class StreamCapture:
                 self.stream.flush()
                 if self.monkeypatch:
                         self.stream.write = self.oldwrite
-                os.dup2(self.dup_fd,self.fd)
+                os.dup2(self.dup_fd,self.stream.fileno())
                 os.close(self.pipe_write_fd)
         def __enter__(self):
                 return self
@@ -288,23 +281,16 @@ when Windows is detected via <code>platform.system()=='Windows'</code>.</li>
                                The default is to enable monkeypatching only
                                when Windows is detected via `platform.system()==&#39;Windows&#39;`.
                 &#34;&#34;&#34;
-                self.active = True
-                self.writer = writer
-                self.stream = stream
-                self.fd = stream.fileno()
-                self.echo = echo
-                (r,w) = os.pipe()
-                self.pipe_read_fd = r
-                self.pipe_write_fd = w
-                self.dup_fd = os.dup(self.fd)
-                os.dup2(w,self.fd)
+                (self.active, self.writer, self.stream, self.echo) = (True,writer,stream,echo)
+                (self.pipe_read_fd, self.pipe_write_fd) = os.pipe()
+                self.dup_fd = os.dup(stream.fileno())
+                os.dup2(self.pipe_write_fd,stream.fileno())
                 self.monkeypatch = monkeypatch if monkeypatch is not None else platform.system()==&#39;Windows&#39;
                 if self.monkeypatch:
                         self.oldwrite = stream.write
-                        stream.write = lambda z: os.write(self.fd,z.encode() if type(z)==str else z)
-                t = threading.Thread(target=self.printer)
-                self.thread = t
-                t.start()
+                        stream.write = lambda z: os.write(stream.fileno(),z.encode() if hasattr(z,&#39;encode&#39;) else z)
+                self.thread = threading.Thread(target=self.printer)
+                self.thread.start()
         def printer(self):
                 &#34;&#34;&#34;This is the thread that listens to the pipe output and passes it to the writer stream.&#34;&#34;&#34;
                 while True:
@@ -325,7 +311,7 @@ when Windows is detected via <code>platform.system()=='Windows'</code>.</li>
                 self.stream.flush()
                 if self.monkeypatch:
                         self.stream.write = self.oldwrite
-                os.dup2(self.dup_fd,self.fd)
+                os.dup2(self.dup_fd,self.stream.fileno())
                 os.close(self.pipe_write_fd)
         def __enter__(self):
                 return self
@@ -351,7 +337,7 @@ when Windows is detected via <code>platform.system()=='Windows'</code>.</li>
         self.stream.flush()
         if self.monkeypatch:
                 self.stream.write = self.oldwrite
-        os.dup2(self.dup_fd,self.fd)
+        os.dup2(self.dup_fd,self.stream.fileno())
         os.close(self.pipe_write_fd)</code></pre>
 </details>
 </dd>

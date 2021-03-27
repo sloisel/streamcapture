@@ -39,10 +39,10 @@ to `StreamCapture.dup_fd` with `os.write()`.
 
 On Windows, `sys.stdout` and `sys.stderr` do not take kindly to their `fileno()` being
 redirected with `os.dup2`. `StreamCapture` features an optional workaround, enabled by the
-`monkeypatching` optional parameter to the constructor. When enabled, the workaround
+`monkeypatch` optional parameter to the constructor. When enabled, the workaround
 overwrites `stream.write(...)` by an implementation that sends everything to `os.write(self.fd,...)`.
-This workaround is enabled when `monkeypatching=True` and disabled when `monkeypatching=False`.
-The default is `monkeypatching=None`, in which case monkeypatching is enabled only when 
+This workaround is enabled when `monkeypatch=True` and disabled when `monkeypatch=False`.
+The default is `monkeypatch=None`, in which case monkeypatching is enabled only when 
 `platform.system()=='Windows'`.
 
 When writing to multiple streams and file descriptors, sometimes the order in which the writes
