@@ -196,16 +196,18 @@ class StreamCapture:
                 self.thread.start()
         def printer(self):
                 &#34;&#34;&#34;This is the thread that listens to the pipe output and passes it to the writer stream.&#34;&#34;&#34;
-                while True:
-                        data = os.read(self.pipe_read_fd,100000)
-                        if(len(data)==0):
+                try:
+                        while True:
+                                data = os.read(self.pipe_read_fd,100000)
+                                if(len(data)==0):
+                                        break
+                                self.writer.write(data)
+                                if self.echo:
+                                        os.write(self.dup_fd,data)
+                finally:
                                 self.writer.close()
                                 os.close(self.dup_fd)
                                 os.close(self.pipe_read_fd)
-                                return
-                        self.writer.write(data)
-                        if self.echo:
-                                os.write(self.dup_fd,data)
         def close(self):
                 &#34;&#34;&#34;When you want to &#34;uncapture&#34; a stream, use this method.&#34;&#34;&#34;
                 if not self.active:
@@ -293,16 +295,18 @@ when Windows is detected via <code>platform.system()=='Windows'</code>.</li>
                 self.thread.start()
         def printer(self):
                 &#34;&#34;&#34;This is the thread that listens to the pipe output and passes it to the writer stream.&#34;&#34;&#34;
-                while True:
-                        data = os.read(self.pipe_read_fd,100000)
-                        if(len(data)==0):
+                try:
+                        while True:
+                                data = os.read(self.pipe_read_fd,100000)
+                                if(len(data)==0):
+                                        break
+                                self.writer.write(data)
+                                if self.echo:
+                                        os.write(self.dup_fd,data)
+                finally:
                                 self.writer.close()
                                 os.close(self.dup_fd)
                                 os.close(self.pipe_read_fd)
-                                return
-                        self.writer.write(data)
-                        if self.echo:
-                                os.write(self.dup_fd,data)
         def close(self):
                 &#34;&#34;&#34;When you want to &#34;uncapture&#34; a stream, use this method.&#34;&#34;&#34;
                 if not self.active:
@@ -352,16 +356,18 @@ when Windows is detected via <code>platform.system()=='Windows'</code>.</li>
 </summary>
 <pre><code class="python">def printer(self):
         &#34;&#34;&#34;This is the thread that listens to the pipe output and passes it to the writer stream.&#34;&#34;&#34;
-        while True:
-                data = os.read(self.pipe_read_fd,100000)
-                if(len(data)==0):
+        try:
+                while True:
+                        data = os.read(self.pipe_read_fd,100000)
+                        if(len(data)==0):
+                                break
+                        self.writer.write(data)
+                        if self.echo:
+                                os.write(self.dup_fd,data)
+        finally:
                         self.writer.close()
                         os.close(self.dup_fd)
-                        os.close(self.pipe_read_fd)
-                        return
-                self.writer.write(data)
-                if self.echo:
-                        os.write(self.dup_fd,data)</code></pre>
+                        os.close(self.pipe_read_fd)</code></pre>
 </details>
 </dd>
 </dl>

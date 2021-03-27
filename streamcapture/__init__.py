@@ -111,16 +111,18 @@ class StreamCapture:
 		self.thread.start()
 	def printer(self):
 		"""This is the thread that listens to the pipe output and passes it to the writer stream."""
-		while True:
-			data = os.read(self.pipe_read_fd,100000)
-			if(len(data)==0):
+		try:
+			while True:
+				data = os.read(self.pipe_read_fd,100000)
+				if(len(data)==0):
+					break
+				self.writer.write(data)
+				if self.echo:
+					os.write(self.dup_fd,data)
+		finally:
 				self.writer.close()
 				os.close(self.dup_fd)
 				os.close(self.pipe_read_fd)
-				return
-			self.writer.write(data)
-			if self.echo:
-				os.write(self.dup_fd,data)
 	def close(self):
 		"""When you want to "uncapture" a stream, use this method."""
 		if not self.active:
