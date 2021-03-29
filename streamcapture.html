@@ -79,6 +79,10 @@ This allows one to send, e.g. <code>stdout</code> to a log file while simultaneo
 similar to the <code>tee</code> console command in Unix. The <code>echo</code> flag can be set to <code>False</code> to disable this.</p>
 <p>One can call <code><a title="streamcapture.StreamCapture.close" href="#streamcapture.StreamCapture.close">StreamCapture.close()</a></code> to cleanly unwind the captured streams. This is automatically
 done if <code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a></code> is used in a <code>with</code> block.</p>
+<p>One may also wish to capture a filedescriptor without the overhead of a wrapping Python stream.
+To that end, one may use <code>FDCapture(fd,writer,echo=True)</code>. The parameter <code>fd</code> is an integer filedescriptor
+to be captured. <code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a></code> is a thin wrapper around <code><a title="streamcapture.FDCapture" href="#streamcapture.FDCapture">FDCapture</a></code>, it mainly adds the monkeypatching
+capability.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -158,40 +162,22 @@ similar to the `tee` console command in Unix. The `echo` flag can be set to `Fal
 
 One can call `StreamCapture.close()` to cleanly unwind the captured streams. This is automatically
 done if `StreamCapture` is used in a `with` block.
+
+One may also wish to capture a filedescriptor without the overhead of a wrapping Python stream.
+To that end, one may use `FDCapture(fd,writer,echo=True)`. The parameter `fd` is an integer filedescriptor
+to be captured. `StreamCapture` is a thin wrapper around `FDCapture`, it mainly adds the monkeypatching
+capability.
 &#34;&#34;&#34;
 
 import os, sys, threading, platform
 
-class StreamCapture:
-        def __init__(self,stream,writer,echo=True,monkeypatch=None):
-                &#34;&#34;&#34;
-                The `StreamCapture` constructor. Parameters are:
-
-                * `stream`: The stream to capture (e.g. `sys.stdout`). This stream should be connected to an
-                            underlying `fileno()`.
-                * `writer`: The stream to write to (e.g. `writer=open(&#39;logfile.txt&#39;,&#39;wb&#39;))`). If applicable, the
-                            `writer` stream should be opened in binary mode. This object need not be an actual
-                            Python stream; any object that implements functions `writer.write(data)` and 
-                            `writer.close()` is suitable here. The only caveat is that `StreamCapture` will
-                            call into `writer` from a separate thread, so if `writer.write()` or `writer.close()`
-                            have significant side-effects, then one should make use of appropriate locking
-                            primitives. This is not necessary for plain-old files obtained from `open(...)`, but
-                            if a writer accumulates the outputs in an in-memory list, then one should use
-                            appropriate thread-safe locking to interact with this list from the main thread.
-                * `echo=True`: If `True`, send data to `StreamCapture.dup_fd` in addition to `StreamCapture.writer()`.
-                * `monkeypatch`: If `True`, replaces `stream.write(data)` with `os.write(fd,data)` (more or less).
-                               This is necessary on Windows for `stdout` and `stderr`.
-                               The default is to enable monkeypatching only
-                               when Windows is detected via `platform.system()==&#39;Windows&#39;`.
-                &#34;&#34;&#34;
-                (self.active, self.writer, self.stream, self.echo) = (True,writer,stream,echo)
+class FDCapture:
+        def __init__(self,fd,writer,echo=True):
+                &#34;&#34;&#34;`FDCapture` constructor.&#34;&#34;&#34;
+                (self.active, self.writer, self.fd, self.echo) = (True,writer,fd,echo)
                 (self.pipe_read_fd, self.pipe_write_fd) = os.pipe()
-                self.dup_fd = os.dup(stream.fileno())
-                os.dup2(self.pipe_write_fd,stream.fileno())
-                self.monkeypatch = monkeypatch if monkeypatch is not None else platform.system()==&#39;Windows&#39;
-                if self.monkeypatch:
-                        self.oldwrite = stream.write
-                        stream.write = lambda z: os.write(stream.fileno(),z.encode() if hasattr(z,&#39;encode&#39;) else z)
+                self.dup_fd = os.dup(fd)
+                os.dup2(self.pipe_write_fd,fd)
                 self.thread = threading.Thread(target=self.printer)
                 self.thread.start()
         def printer(self):
@@ -205,19 +191,36 @@ class StreamCapture:
                                 if self.echo:
                                         os.write(self.dup_fd,data)
                 finally:
-                                self.writer.close()
-                                os.close(self.dup_fd)
-                                os.close(self.pipe_read_fd)
+                        self.writer.close()
+                        os.close(self.dup_fd)
+                        os.close(self.pipe_read_fd)
         def close(self):
                 &#34;&#34;&#34;When you want to &#34;uncapture&#34; a stream, use this method.&#34;&#34;&#34;
                 if not self.active:
                         return
                 self.active = False
+                os.dup2(self.dup_fd,self.fd)
+                os.close(self.pipe_write_fd)
+        def __enter__(self):
+                return self
+        def __exit__(self,a,b,c):
+                self.close()
+
+class StreamCapture:
+        def __init__(self,stream,writer,echo=True,monkeypatch=None):
+                &#34;&#34;&#34;The `StreamCapture` constructor.&#34;&#34;&#34;
+                self.fdcapture = FDCapture(stream.fileno(),writer,echo)
+                self.stream = stream
+                self.monkeypatch = platform.system()==&#39;Windows&#39; if monkeypatch is None else monkeypatch
+                if self.monkeypatch:
+                        self.oldwrite = stream.write
+                        stream.write = lambda z: os.write(stream.fileno(),z.encode() if hasattr(z,&#39;encode&#39;) else z)
+        def close(self):
+                &#34;&#34;&#34;When you want to &#34;uncapture&#34; a stream, use this method.&#34;&#34;&#34;
                 self.stream.flush()
+                self.fdcapture.close()
                 if self.monkeypatch:
                         self.stream.write = self.oldwrite
-                os.dup2(self.dup_fd,self.stream.fileno())
-                os.close(self.pipe_write_fd)
         def __enter__(self):
                 return self
         def __exit__(self,a,b,c):
@@ -233,64 +236,23 @@ class StreamCapture:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="streamcapture.StreamCapture"><code class="flex name class">
-<span>class <span class="ident">StreamCapture</span></span>
-<span>(</span><span>stream, writer, echo=True, monkeypatch=None)</span>
+<dt id="streamcapture.FDCapture"><code class="flex name class">
+<span>class <span class="ident">FDCapture</span></span>
+<span>(</span><span>fd, writer, echo=True)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>The <code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a></code> constructor. Parameters are:</p>
-<ul>
-<li><code>stream</code>: The stream to capture (e.g. <code>sys.stdout</code>). This stream should be connected to an
-underlying <code>fileno()</code>.</li>
-<li><code>writer</code>: The stream to write to (e.g. <code>writer=open('logfile.txt','wb'))</code>). If applicable, the
-<code>writer</code> stream should be opened in binary mode. This object need not be an actual
-Python stream; any object that implements functions <code>writer.write(data)</code> and
-<code>writer.close()</code> is suitable here. The only caveat is that <code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a></code> will
-call into <code>writer</code> from a separate thread, so if <code>writer.write()</code> or <code>writer.close()</code>
-have significant side-effects, then one should make use of appropriate locking
-primitives. This is not necessary for plain-old files obtained from <code>open(&hellip;)</code>, but
-if a writer accumulates the outputs in an in-memory list, then one should use
-appropriate thread-safe locking to interact with this list from the main thread.</li>
-<li><code>echo=True</code>: If <code>True</code>, send data to <code>StreamCapture.dup_fd</code> in addition to <code>StreamCapture.writer()</code>.</li>
-<li><code>monkeypatch</code>: If <code>True</code>, replaces <code>stream.write(data)</code> with <code>os.write(fd,data)</code> (more or less).
-This is necessary on Windows for <code>stdout</code> and <code>stderr</code>.
-The default is to enable monkeypatching only
-when Windows is detected via <code>platform.system()=='Windows'</code>.</li>
-</ul></div>
+<div class="desc"><p><code><a title="streamcapture.FDCapture" href="#streamcapture.FDCapture">FDCapture</a></code> constructor.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class StreamCapture:
-        def __init__(self,stream,writer,echo=True,monkeypatch=None):
-                &#34;&#34;&#34;
-                The `StreamCapture` constructor. Parameters are:
-
-                * `stream`: The stream to capture (e.g. `sys.stdout`). This stream should be connected to an
-                            underlying `fileno()`.
-                * `writer`: The stream to write to (e.g. `writer=open(&#39;logfile.txt&#39;,&#39;wb&#39;))`). If applicable, the
-                            `writer` stream should be opened in binary mode. This object need not be an actual
-                            Python stream; any object that implements functions `writer.write(data)` and 
-                            `writer.close()` is suitable here. The only caveat is that `StreamCapture` will
-                            call into `writer` from a separate thread, so if `writer.write()` or `writer.close()`
-                            have significant side-effects, then one should make use of appropriate locking
-                            primitives. This is not necessary for plain-old files obtained from `open(...)`, but
-                            if a writer accumulates the outputs in an in-memory list, then one should use
-                            appropriate thread-safe locking to interact with this list from the main thread.
-                * `echo=True`: If `True`, send data to `StreamCapture.dup_fd` in addition to `StreamCapture.writer()`.
-                * `monkeypatch`: If `True`, replaces `stream.write(data)` with `os.write(fd,data)` (more or less).
-                               This is necessary on Windows for `stdout` and `stderr`.
-                               The default is to enable monkeypatching only
-                               when Windows is detected via `platform.system()==&#39;Windows&#39;`.
-                &#34;&#34;&#34;
-                (self.active, self.writer, self.stream, self.echo) = (True,writer,stream,echo)
+<pre><code class="python">class FDCapture:
+        def __init__(self,fd,writer,echo=True):
+                &#34;&#34;&#34;`FDCapture` constructor.&#34;&#34;&#34;
+                (self.active, self.writer, self.fd, self.echo) = (True,writer,fd,echo)
                 (self.pipe_read_fd, self.pipe_write_fd) = os.pipe()
-                self.dup_fd = os.dup(stream.fileno())
-                os.dup2(self.pipe_write_fd,stream.fileno())
-                self.monkeypatch = monkeypatch if monkeypatch is not None else platform.system()==&#39;Windows&#39;
-                if self.monkeypatch:
-                        self.oldwrite = stream.write
-                        stream.write = lambda z: os.write(stream.fileno(),z.encode() if hasattr(z,&#39;encode&#39;) else z)
+                self.dup_fd = os.dup(fd)
+                os.dup2(self.pipe_write_fd,fd)
                 self.thread = threading.Thread(target=self.printer)
                 self.thread.start()
         def printer(self):
@@ -304,18 +266,15 @@ when Windows is detected via <code>platform.system()=='Windows'</code>.</li>
                                 if self.echo:
                                         os.write(self.dup_fd,data)
                 finally:
-                                self.writer.close()
-                                os.close(self.dup_fd)
-                                os.close(self.pipe_read_fd)
+                        self.writer.close()
+                        os.close(self.dup_fd)
+                        os.close(self.pipe_read_fd)
         def close(self):
                 &#34;&#34;&#34;When you want to &#34;uncapture&#34; a stream, use this method.&#34;&#34;&#34;
                 if not self.active:
                         return
                 self.active = False
-                self.stream.flush()
-                if self.monkeypatch:
-                        self.stream.write = self.oldwrite
-                os.dup2(self.dup_fd,self.stream.fileno())
+                os.dup2(self.dup_fd,self.fd)
                 os.close(self.pipe_write_fd)
         def __enter__(self):
                 return self
@@ -324,7 +283,7 @@ when Windows is detected via <code>platform.system()=='Windows'</code>.</li>
 </details>
 <h3>Methods</h3>
 <dl>
-<dt id="streamcapture.StreamCapture.close"><code class="name flex">
+<dt id="streamcapture.FDCapture.close"><code class="name flex">
 <span>def <span class="ident">close</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -338,14 +297,11 @@ when Windows is detected via <code>platform.system()=='Windows'</code>.</li>
         if not self.active:
                 return
         self.active = False
-        self.stream.flush()
-        if self.monkeypatch:
-                self.stream.write = self.oldwrite
-        os.dup2(self.dup_fd,self.stream.fileno())
+        os.dup2(self.dup_fd,self.fd)
         os.close(self.pipe_write_fd)</code></pre>
 </details>
 </dd>
-<dt id="streamcapture.StreamCapture.printer"><code class="name flex">
+<dt id="streamcapture.FDCapture.printer"><code class="name flex">
 <span>def <span class="ident">printer</span></span>(<span>self)</span>
 </code></dt>
 <dd>
@@ -365,9 +321,60 @@ when Windows is detected via <code>platform.system()=='Windows'</code>.</li>
                         if self.echo:
                                 os.write(self.dup_fd,data)
         finally:
-                        self.writer.close()
-                        os.close(self.dup_fd)
-                        os.close(self.pipe_read_fd)</code></pre>
+                self.writer.close()
+                os.close(self.dup_fd)
+                os.close(self.pipe_read_fd)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="streamcapture.StreamCapture"><code class="flex name class">
+<span>class <span class="ident">StreamCapture</span></span>
+<span>(</span><span>stream, writer, echo=True, monkeypatch=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>The <code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a></code> constructor.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class StreamCapture:
+        def __init__(self,stream,writer,echo=True,monkeypatch=None):
+                &#34;&#34;&#34;The `StreamCapture` constructor.&#34;&#34;&#34;
+                self.fdcapture = FDCapture(stream.fileno(),writer,echo)
+                self.stream = stream
+                self.monkeypatch = platform.system()==&#39;Windows&#39; if monkeypatch is None else monkeypatch
+                if self.monkeypatch:
+                        self.oldwrite = stream.write
+                        stream.write = lambda z: os.write(stream.fileno(),z.encode() if hasattr(z,&#39;encode&#39;) else z)
+        def close(self):
+                &#34;&#34;&#34;When you want to &#34;uncapture&#34; a stream, use this method.&#34;&#34;&#34;
+                self.stream.flush()
+                self.fdcapture.close()
+                if self.monkeypatch:
+                        self.stream.write = self.oldwrite
+        def __enter__(self):
+                return self
+        def __exit__(self,a,b,c):
+                self.close()</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="streamcapture.StreamCapture.close"><code class="name flex">
+<span>def <span class="ident">close</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>When you want to "uncapture" a stream, use this method.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def close(self):
+        &#34;&#34;&#34;When you want to &#34;uncapture&#34; a stream, use this method.&#34;&#34;&#34;
+        self.stream.flush()
+        self.fdcapture.close()
+        if self.monkeypatch:
+                self.stream.write = self.oldwrite</code></pre>
 </details>
 </dd>
 </dl>
@@ -392,10 +399,16 @@ when Windows is detected via <code>platform.system()=='Windows'</code>.</li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
+<h4><code><a title="streamcapture.FDCapture" href="#streamcapture.FDCapture">FDCapture</a></code></h4>
+<ul class="">
+<li><code><a title="streamcapture.FDCapture.close" href="#streamcapture.FDCapture.close">close</a></code></li>
+<li><code><a title="streamcapture.FDCapture.printer" href="#streamcapture.FDCapture.printer">printer</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a></code></h4>
 <ul class="">
 <li><code><a title="streamcapture.StreamCapture.close" href="#streamcapture.StreamCapture.close">close</a></code></li>
-<li><code><a title="streamcapture.StreamCapture.printer" href="#streamcapture.StreamCapture.printer">printer</a></code></li>
 </ul>
 </li>
 </ul>

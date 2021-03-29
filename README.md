@@ -74,3 +74,8 @@ similar to the `tee` console command in Unix. The `echo` flag can be set to `Fal
 One can call `StreamCapture.close()` to cleanly unwind the captured streams. This is automatically
 done if `StreamCapture` is used in a `with` block.
 
+One may also wish to capture a filedescriptor without the overhead of a wrapping Python stream.
+To that end, one may use `FDCapture(fd,writer,echo=True)`. The parameter `fd` is an integer filedescriptor
+to be captured. `StreamCapture` is a thin wrapper around `FDCapture`, it mainly adds the monkeypatching
+capability.
+
