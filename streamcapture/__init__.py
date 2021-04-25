@@ -78,9 +78,58 @@ One may also wish to capture a filedescriptor without the overhead of a wrapping
 To that end, one may use `FDCapture(fd,writer,echo=True)`. The parameter `fd` is an integer filedescriptor
 to be captured. `StreamCapture` is a thin wrapper around `FDCapture`, it mainly adds the monkeypatching
 capability.
+
+`streamcapture.Writer` is a thin wrapper around an underlying stream, that allows sharing a stream
+between multiple threads in a thread-safe manner, guaranteeing that the underlying stream is closed
+only when all threads have called `close`. `Writer` objects are constructed by
+`streamcapture.Writer(stream,count,lock_write = False)`.
+
+`stream`: is a stream that is being wrapped, e.g. `stream = open('logfile.txt','wb')`
+
+`count`: is the number of times that `Writer.close()` will be called before the writer
+is finally closed. This is so that a single stream can be used from multiple threads.
+
+`lock_write`: set this to `True` if you want calls to `stream.write()` to be serialized.
+This causes `Writer.write` to acquire `Writer.lock` before calling `stream.write`.
+If `lock_write=False` then `Writer.lock` is not acquired. Use this when `stream.write` is
+thread-safe. `lock_write=False` is the default.
+
+Example usage:
+```python
+import sys, streamcapture
+writer = streamcapture.Writer(open('logfile.txt','wb'),2)
+with streamcapture.StreamCapture(sys.stdout,writer), streamcapture.StreamCapture(sys.stderr,writer):
+	print("This goes to stdout and is captured to logfile.txt")
+	print("This goes to stderr and is also captured to logfile.txt",file=sys.stderr)
+```
+
+In the above example, writer will be closed twice: once from the `StreamCapture(sys.stdout,...)`
+object, and once from the `StreamCapture(sys.stderr,...)` object. Correspondingly, the `count` parameter
+of the `streamcapture.Writer` was set to `2`, so that the underlying stream is only closed after 2
+calls to `writer.close()`.
 """
 
 import os, sys, threading, platform
+
+class Writer:
+	def __init__(self,stream,count,lock_write = False):
+		"""`Writer` constructor."""
+		(self.stream,self.count,self.lock_write) = (stream,count,lock_write)
+		self.lock = threading.Lock()
+	def close(self):
+		"""When one is done using a `Writer`, one calls `Writer.close()`. This acquires `Writer.lock` so it is
+		thread-safe. Each time `Writer.close()` is called, `Writer.count` is decremented. When `Writer.count`
+		reaches `0`, `stream.close()` is called."""
+		with self.lock:
+			self.count -= 1
+			if(self.count==0):
+				self.stream.close()
+	def write(self,z):
+		if self.lock_write:
+			with self.lock:
+				self.stream.write(z)
+		else:
+			self.stream.write(z)
 
 class FDCapture:
 	def __init__(self,fd,writer,echo=True):

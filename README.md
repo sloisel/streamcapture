@@ -79,3 +79,32 @@ To that end, one may use `FDCapture(fd,writer,echo=True)`. The parameter `fd` is
 to be captured. `StreamCapture` is a thin wrapper around `FDCapture`, it mainly adds the monkeypatching
 capability.
 
+`streamcapture.Writer` is a thin wrapper around an underlying stream, that allows sharing a stream
+between multiple threads in a thread-safe manner, guaranteeing that the underlying stream is closed
+only when all threads have called `close`. `Writer` objects are constructed by
+`streamcapture.Writer(stream,count,lock_write = False)`.
+
+`stream`: is a stream that is being wrapped, e.g. `stream = open('logfile.txt','wb')`
+
+`count`: is the number of times that `Writer.close()` will be called before the writer
+is finally closed. This is so that a single stream can be used from multiple threads.
+
+`lock_write`: set this to `True` if you want calls to `stream.write()` to be serialized.
+This causes `Writer.write` to acquire `Writer.lock` before calling `stream.write`.
+If `lock_write=False` then `Writer.lock` is not acquired. Use this when `stream.write` is
+thread-safe. `lock_write=False` is the default.
+
+Example usage:
+```python
+import sys, streamcapture
+writer = streamcapture.Writer(open('logfile.txt','wb'),2)
+with streamcapture.StreamCapture(sys.stdout,writer), streamcapture.StreamCapture(sys.stderr,writer):
+	print("This goes to stdout and is captured to logfile.txt")
+	print("This goes to stderr and is also captured to logfile.txt",file=sys.stderr)
+```
+
+In the above example, writer will be closed twice: once from the `StreamCapture(sys.stdout,...)`
+object, and once from the `StreamCapture(sys.stderr,...)` object. Correspondingly, the `count` parameter
+of the `streamcapture.Writer` was set to `2`, so that the underlying stream is only closed after 2
+calls to `writer.close()`.
+

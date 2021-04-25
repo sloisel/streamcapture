@@ -83,6 +83,28 @@ done if <code><a title="streamcapture.StreamCapture" href="#streamcapture.Stream
 To that end, one may use <code>FDCapture(fd,writer,echo=True)</code>. The parameter <code>fd</code> is an integer filedescriptor
 to be captured. <code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a></code> is a thin wrapper around <code><a title="streamcapture.FDCapture" href="#streamcapture.FDCapture">FDCapture</a></code>, it mainly adds the monkeypatching
 capability.</p>
+<p><code><a title="streamcapture.Writer" href="#streamcapture.Writer">Writer</a></code> is a thin wrapper around an underlying stream, that allows sharing a stream
+between multiple threads in a thread-safe manner, guaranteeing that the underlying stream is closed
+only when all threads have called <code>close</code>. <code><a title="streamcapture.Writer" href="#streamcapture.Writer">Writer</a></code> objects are constructed by
+<code>streamcapture.Writer(stream,count,lock_write = False)</code>.</p>
+<p><code>stream</code>: is a stream that is being wrapped, e.g. <code>stream = open('logfile.txt','wb')</code></p>
+<p><code>count</code>: is the number of times that <code><a title="streamcapture.Writer.close" href="#streamcapture.Writer.close">Writer.close()</a></code> will be called before the writer
+is finally closed. This is so that a single stream can be used from multiple threads.</p>
+<p><code>lock_write</code>: set this to <code>True</code> if you want calls to <code>stream.write()</code> to be serialized.
+This causes <code><a title="streamcapture.Writer.write" href="#streamcapture.Writer.write">Writer.write()</a></code> to acquire <code>Writer.lock</code> before calling <code>stream.write</code>.
+If <code>lock_write=False</code> then <code>Writer.lock</code> is not acquired. Use this when <code>stream.write</code> is
+thread-safe. <code>lock_write=False</code> is the default.</p>
+<p>Example usage:</p>
+<pre><code class="language-python">import sys, streamcapture
+writer = streamcapture.Writer(open('logfile.txt','wb'),2)
+with streamcapture.StreamCapture(sys.stdout,writer), streamcapture.StreamCapture(sys.stderr,writer):
+        print(&quot;This goes to stdout and is captured to logfile.txt&quot;)
+        print(&quot;This goes to stderr and is also captured to logfile.txt&quot;,file=sys.stderr)
+</code></pre>
+<p>In the above example, writer will be closed twice: once from the <code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a>(sys.stdout,&hellip;)</code>
+object, and once from the <code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a>(sys.stderr,&hellip;)</code> object. Correspondingly, the <code>count</code> parameter
+of the <code><a title="streamcapture.Writer" href="#streamcapture.Writer">Writer</a></code> was set to <code>2</code>, so that the underlying stream is only closed after 2
+calls to <code>writer.close()</code>.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -167,9 +189,58 @@ One may also wish to capture a filedescriptor without the overhead of a wrapping
 To that end, one may use `FDCapture(fd,writer,echo=True)`. The parameter `fd` is an integer filedescriptor
 to be captured. `StreamCapture` is a thin wrapper around `FDCapture`, it mainly adds the monkeypatching
 capability.
+
+`streamcapture.Writer` is a thin wrapper around an underlying stream, that allows sharing a stream
+between multiple threads in a thread-safe manner, guaranteeing that the underlying stream is closed
+only when all threads have called `close`. `Writer` objects are constructed by
+`streamcapture.Writer(stream,count,lock_write = False)`.
+
+`stream`: is a stream that is being wrapped, e.g. `stream = open(&#39;logfile.txt&#39;,&#39;wb&#39;)`
+
+`count`: is the number of times that `Writer.close()` will be called before the writer
+is finally closed. This is so that a single stream can be used from multiple threads.
+
+`lock_write`: set this to `True` if you want calls to `stream.write()` to be serialized.
+This causes `Writer.write` to acquire `Writer.lock` before calling `stream.write`.
+If `lock_write=False` then `Writer.lock` is not acquired. Use this when `stream.write` is
+thread-safe. `lock_write=False` is the default.
+
+Example usage:
+```python
+import sys, streamcapture
+writer = streamcapture.Writer(open(&#39;logfile.txt&#39;,&#39;wb&#39;),2)
+with streamcapture.StreamCapture(sys.stdout,writer), streamcapture.StreamCapture(sys.stderr,writer):
+        print(&#34;This goes to stdout and is captured to logfile.txt&#34;)
+        print(&#34;This goes to stderr and is also captured to logfile.txt&#34;,file=sys.stderr)
+```
+
+In the above example, writer will be closed twice: once from the `StreamCapture(sys.stdout,...)`
+object, and once from the `StreamCapture(sys.stderr,...)` object. Correspondingly, the `count` parameter
+of the `streamcapture.Writer` was set to `2`, so that the underlying stream is only closed after 2
+calls to `writer.close()`.
 &#34;&#34;&#34;
 
 import os, sys, threading, platform
+
+class Writer:
+        def __init__(self,stream,count,lock_write = False):
+                &#34;&#34;&#34;`Writer` constructor.&#34;&#34;&#34;
+                (self.stream,self.count,self.lock_write) = (stream,count,lock_write)
+                self.lock = threading.Lock()
+        def close(self):
+                &#34;&#34;&#34;When one is done using a `Writer`, one calls `Writer.close()`. This acquires `Writer.lock` so it is
+                thread-safe. Each time `Writer.close()` is called, `Writer.count` is decremented. When `Writer.count`
+                reaches `0`, `stream.close()` is called.&#34;&#34;&#34;
+                with self.lock:
+                        self.count -= 1
+                        if(self.count==0):
+                                self.stream.close()
+        def write(self,z):
+                if self.lock_write:
+                        with self.lock:
+                                self.stream.write(z)
+                else:
+                        self.stream.write(z)
 
 class FDCapture:
         def __init__(self,fd,writer,echo=True):
@@ -379,6 +450,78 @@ class StreamCapture:
 </dd>
 </dl>
 </dd>
+<dt id="streamcapture.Writer"><code class="flex name class">
+<span>class <span class="ident">Writer</span></span>
+<span>(</span><span>stream, count, lock_write=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p><code><a title="streamcapture.Writer" href="#streamcapture.Writer">Writer</a></code> constructor.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Writer:
+        def __init__(self,stream,count,lock_write = False):
+                &#34;&#34;&#34;`Writer` constructor.&#34;&#34;&#34;
+                (self.stream,self.count,self.lock_write) = (stream,count,lock_write)
+                self.lock = threading.Lock()
+        def close(self):
+                &#34;&#34;&#34;When one is done using a `Writer`, one calls `Writer.close()`. This acquires `Writer.lock` so it is
+                thread-safe. Each time `Writer.close()` is called, `Writer.count` is decremented. When `Writer.count`
+                reaches `0`, `stream.close()` is called.&#34;&#34;&#34;
+                with self.lock:
+                        self.count -= 1
+                        if(self.count==0):
+                                self.stream.close()
+        def write(self,z):
+                if self.lock_write:
+                        with self.lock:
+                                self.stream.write(z)
+                else:
+                        self.stream.write(z)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="streamcapture.Writer.close"><code class="name flex">
+<span>def <span class="ident">close</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>When one is done using a <code><a title="streamcapture.Writer" href="#streamcapture.Writer">Writer</a></code>, one calls <code><a title="streamcapture.Writer.close" href="#streamcapture.Writer.close">Writer.close()</a></code>. This acquires <code>Writer.lock</code> so it is
+thread-safe. Each time <code><a title="streamcapture.Writer.close" href="#streamcapture.Writer.close">Writer.close()</a></code> is called, <code>Writer.count</code> is decremented. When <code>Writer.count</code>
+reaches <code>0</code>, <code>stream.close()</code> is called.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def close(self):
+        &#34;&#34;&#34;When one is done using a `Writer`, one calls `Writer.close()`. This acquires `Writer.lock` so it is
+        thread-safe. Each time `Writer.close()` is called, `Writer.count` is decremented. When `Writer.count`
+        reaches `0`, `stream.close()` is called.&#34;&#34;&#34;
+        with self.lock:
+                self.count -= 1
+                if(self.count==0):
+                        self.stream.close()</code></pre>
+</details>
+</dd>
+<dt id="streamcapture.Writer.write"><code class="name flex">
+<span>def <span class="ident">write</span></span>(<span>self, z)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def write(self,z):
+        if self.lock_write:
+                with self.lock:
+                        self.stream.write(z)
+        else:
+                self.stream.write(z)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
 </dl>
 </section>
 </article>
@@ -409,6 +552,13 @@ class StreamCapture:
 <h4><code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a></code></h4>
 <ul class="">
 <li><code><a title="streamcapture.StreamCapture.close" href="#streamcapture.StreamCapture.close">close</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="streamcapture.Writer" href="#streamcapture.Writer">Writer</a></code></h4>
+<ul class="">
+<li><code><a title="streamcapture.Writer.close" href="#streamcapture.Writer.close">close</a></code></li>
+<li><code><a title="streamcapture.Writer.write" href="#streamcapture.Writer.write">write</a></code></li>
 </ul>
 </li>
 </ul>
