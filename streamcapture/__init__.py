@@ -116,6 +116,7 @@ class Writer:
 		"""`Writer` constructor."""
 		(self.stream,self.count,self.lock_write) = (stream,count,lock_write)
 		self.lock = threading.Lock()
+		self.write = self.locked_write if lock_write else stream.write
 	def close(self):
 		"""When one is done using a `Writer`, one calls `Writer.close()`. This acquires `Writer.lock` so it is
 		thread-safe. Each time `Writer.close()` is called, `Writer.count` is decremented. When `Writer.count`
@@ -124,11 +125,8 @@ class Writer:
 			self.count -= 1
 			if(self.count==0):
 				self.stream.close()
-	def write(self,z):
-		if self.lock_write:
-			with self.lock:
-				self.stream.write(z)
-		else:
+	def locked_write(self,z):
+		with self.lock:
 			self.stream.write(z)
 
 class FDCapture:

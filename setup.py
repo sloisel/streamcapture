@@ -7,7 +7,7 @@ long_description = Path(this_directory, 'README.md').read_text(encoding='utf-8')
 setup(
     name='streamcapture',
     description='Capture output streams such as sys.stdout and sys.stderr.',
-    version='1.1.0',
+    version='1.1.1',
     packages=find_packages(),
     install_requires=['setuptools', 'pdoc3>=0.7'],
     python_requires='>=3',
