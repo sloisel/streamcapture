@@ -112,11 +112,20 @@ calls to `writer.close()`.
 import os, sys, threading, platform
 
 class Writer:
-	def __init__(self,stream,count,lock_write = False):
+	def __init__(self,stream,count = None,lock_write = False):
 		"""`Writer` constructor."""
-		(self.stream,self.count,self.lock_write) = (stream,count,lock_write)
+		(self.stream,self.lock_write) = (stream,lock_write)
+		if count is None:
+			(self.count,self.increment) = (0,1)
+		else:
+			(self.count,self.increment) = (count,0)
 		self.lock = threading.Lock()
-		self.write = self.locked_write if lock_write else stream.write
+		self._write = self.locked_write if lock_write else stream.write
+	def write_from(self,data,cap):
+		self._write(data)
+	def writer_open(self):
+		with self.lock:
+			self.count += self.increment
 	def close(self):
 		"""When one is done using a `Writer`, one calls `Writer.close()`. This acquires `Writer.lock` so it is
 		thread-safe. Each time `Writer.close()` is called, `Writer.count` is decremented. When `Writer.count`
@@ -132,6 +141,8 @@ class Writer:
 class FDCapture:
 	def __init__(self,fd,writer,echo=True):
 		"""`FDCapture` constructor."""
+		if(hasattr(writer,'writer_open')):
+			writer.writer_open()
 		(self.active, self.writer, self.fd, self.echo) = (True,writer,fd,echo)
 		(self.pipe_read_fd, self.pipe_write_fd) = os.pipe()
 		self.dup_fd = os.dup(fd)
@@ -145,7 +156,7 @@ class FDCapture:
 				data = os.read(self.pipe_read_fd,100000)
 				if(len(data)==0):
 					break
-				self.writer.write(data)
+				self.writer.write_from(data,self)
 				if self.echo:
 					os.write(self.dup_fd,data)
 		finally:

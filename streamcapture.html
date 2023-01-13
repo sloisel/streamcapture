@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.2" />
+<meta name="generator" content="pdoc 0.10.0" />
 <title>streamcapture API documentation</title>
 <meta name="description" content="streamcapture: capture the outputs of Python streams, such as sys.stdout and sys.stderr …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -91,7 +91,7 @@ only when all threads have called <code>close</code>. <code><a title="streamcapt
 <p><code>count</code>: is the number of times that <code><a title="streamcapture.Writer.close" href="#streamcapture.Writer.close">Writer.close()</a></code> will be called before the writer
 is finally closed. This is so that a single stream can be used from multiple threads.</p>
 <p><code>lock_write</code>: set this to <code>True</code> if you want calls to <code>stream.write()</code> to be serialized.
-This causes <code><a title="streamcapture.Writer.write" href="#streamcapture.Writer.write">Writer.write()</a></code> to acquire <code>Writer.lock</code> before calling <code>stream.write</code>.
+This causes <code>Writer.write</code> to acquire <code>Writer.lock</code> before calling <code>stream.write</code>.
 If <code>lock_write=False</code> then <code>Writer.lock</code> is not acquired. Use this when <code>stream.write</code> is
 thread-safe. <code>lock_write=False</code> is the default.</p>
 <p>Example usage:</p>
@@ -223,10 +223,20 @@ calls to `writer.close()`.
 import os, sys, threading, platform
 
 class Writer:
-        def __init__(self,stream,count,lock_write = False):
+        def __init__(self,stream,count = None,lock_write = False):
                 &#34;&#34;&#34;`Writer` constructor.&#34;&#34;&#34;
-                (self.stream,self.count,self.lock_write) = (stream,count,lock_write)
+                (self.stream,self.lock_write) = (stream,lock_write)
+                if count is None:
+                        (self.count,self.increment) = (0,1)
+                else:
+                        (self.count,self.increment) = (count,0)
                 self.lock = threading.Lock()
+                self._write = self.locked_write if lock_write else stream.write
+        def write_from(self,data,cap):
+                self._write(data)
+        def writer_open(self):
+                with self.lock:
+                        self.count += self.increment
         def close(self):
                 &#34;&#34;&#34;When one is done using a `Writer`, one calls `Writer.close()`. This acquires `Writer.lock` so it is
                 thread-safe. Each time `Writer.close()` is called, `Writer.count` is decremented. When `Writer.count`
@@ -235,16 +245,15 @@ class Writer:
                         self.count -= 1
                         if(self.count==0):
                                 self.stream.close()
-        def write(self,z):
-                if self.lock_write:
-                        with self.lock:
-                                self.stream.write(z)
-                else:
+        def locked_write(self,z):
+                with self.lock:
                         self.stream.write(z)
 
 class FDCapture:
         def __init__(self,fd,writer,echo=True):
                 &#34;&#34;&#34;`FDCapture` constructor.&#34;&#34;&#34;
+                if(hasattr(writer,&#39;writer_open&#39;)):
+                        writer.writer_open()
                 (self.active, self.writer, self.fd, self.echo) = (True,writer,fd,echo)
                 (self.pipe_read_fd, self.pipe_write_fd) = os.pipe()
                 self.dup_fd = os.dup(fd)
@@ -258,7 +267,7 @@ class FDCapture:
                                 data = os.read(self.pipe_read_fd,100000)
                                 if(len(data)==0):
                                         break
-                                self.writer.write(data)
+                                self.writer.write_from(data,self)
                                 if self.echo:
                                         os.write(self.dup_fd,data)
                 finally:
@@ -320,6 +329,8 @@ class StreamCapture:
 <pre><code class="python">class FDCapture:
         def __init__(self,fd,writer,echo=True):
                 &#34;&#34;&#34;`FDCapture` constructor.&#34;&#34;&#34;
+                if(hasattr(writer,&#39;writer_open&#39;)):
+                        writer.writer_open()
                 (self.active, self.writer, self.fd, self.echo) = (True,writer,fd,echo)
                 (self.pipe_read_fd, self.pipe_write_fd) = os.pipe()
                 self.dup_fd = os.dup(fd)
@@ -333,7 +344,7 @@ class StreamCapture:
                                 data = os.read(self.pipe_read_fd,100000)
                                 if(len(data)==0):
                                         break
-                                self.writer.write(data)
+                                self.writer.write_from(data,self)
                                 if self.echo:
                                         os.write(self.dup_fd,data)
                 finally:
@@ -388,7 +399,7 @@ class StreamCapture:
                         data = os.read(self.pipe_read_fd,100000)
                         if(len(data)==0):
                                 break
-                        self.writer.write(data)
+                        self.writer.write_from(data,self)
                         if self.echo:
                                 os.write(self.dup_fd,data)
         finally:
@@ -452,7 +463,7 @@ class StreamCapture:
 </dd>
 <dt id="streamcapture.Writer"><code class="flex name class">
 <span>class <span class="ident">Writer</span></span>
-<span>(</span><span>stream, count, lock_write=False)</span>
+<span>(</span><span>stream, count=None, lock_write=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p><code><a title="streamcapture.Writer" href="#streamcapture.Writer">Writer</a></code> constructor.</p></div>
@@ -461,10 +472,20 @@ class StreamCapture:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Writer:
-        def __init__(self,stream,count,lock_write = False):
+        def __init__(self,stream,count = None,lock_write = False):
                 &#34;&#34;&#34;`Writer` constructor.&#34;&#34;&#34;
-                (self.stream,self.count,self.lock_write) = (stream,count,lock_write)
+                (self.stream,self.lock_write) = (stream,lock_write)
+                if count is None:
+                        (self.count,self.increment) = (0,1)
+                else:
+                        (self.count,self.increment) = (count,0)
                 self.lock = threading.Lock()
+                self._write = self.locked_write if lock_write else stream.write
+        def write_from(self,data,cap):
+                self._write(data)
+        def writer_open(self):
+                with self.lock:
+                        self.count += self.increment
         def close(self):
                 &#34;&#34;&#34;When one is done using a `Writer`, one calls `Writer.close()`. This acquires `Writer.lock` so it is
                 thread-safe. Each time `Writer.close()` is called, `Writer.count` is decremented. When `Writer.count`
@@ -473,11 +494,8 @@ class StreamCapture:
                         self.count -= 1
                         if(self.count==0):
                                 self.stream.close()
-        def write(self,z):
-                if self.lock_write:
-                        with self.lock:
-                                self.stream.write(z)
-                else:
+        def locked_write(self,z):
+                with self.lock:
                         self.stream.write(z)</code></pre>
 </details>
 <h3>Methods</h3>
@@ -503,8 +521,8 @@ reaches <code>0</code>, <code>stream.close()</code> is called.</p></div>
                         self.stream.close()</code></pre>
 </details>
 </dd>
-<dt id="streamcapture.Writer.write"><code class="name flex">
-<span>def <span class="ident">write</span></span>(<span>self, z)</span>
+<dt id="streamcapture.Writer.locked_write"><code class="name flex">
+<span>def <span class="ident">locked_write</span></span>(<span>self, z)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -512,12 +530,36 @@ reaches <code>0</code>, <code>stream.close()</code> is called.</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def write(self,z):
-        if self.lock_write:
-                with self.lock:
-                        self.stream.write(z)
-        else:
+<pre><code class="python">def locked_write(self,z):
+        with self.lock:
                 self.stream.write(z)</code></pre>
+</details>
+</dd>
+<dt id="streamcapture.Writer.write_from"><code class="name flex">
+<span>def <span class="ident">write_from</span></span>(<span>self, data, cap)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def write_from(self,data,cap):
+        self._write(data)</code></pre>
+</details>
+</dd>
+<dt id="streamcapture.Writer.writer_open"><code class="name flex">
+<span>def <span class="ident">writer_open</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def writer_open(self):
+        with self.lock:
+                self.count += self.increment</code></pre>
 </details>
 </dd>
 </dl>
@@ -558,7 +600,9 @@ reaches <code>0</code>, <code>stream.close()</code> is called.</p></div>
 <h4><code><a title="streamcapture.Writer" href="#streamcapture.Writer">Writer</a></code></h4>
 <ul class="">
 <li><code><a title="streamcapture.Writer.close" href="#streamcapture.Writer.close">close</a></code></li>
-<li><code><a title="streamcapture.Writer.write" href="#streamcapture.Writer.write">write</a></code></li>
+<li><code><a title="streamcapture.Writer.locked_write" href="#streamcapture.Writer.locked_write">locked_write</a></code></li>
+<li><code><a title="streamcapture.Writer.write_from" href="#streamcapture.Writer.write_from">write_from</a></code></li>
+<li><code><a title="streamcapture.Writer.writer_open" href="#streamcapture.Writer.writer_open">writer_open</a></code></li>
 </ul>
 </li>
 </ul>
@@ -567,7 +611,7 @@ reaches <code>0</code>, <code>stream.close()</code> is called.</p></div>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
 </footer>
 </body>
 </html>
