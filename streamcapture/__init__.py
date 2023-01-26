@@ -109,7 +109,7 @@ of the `streamcapture.Writer` was set to `2`, so that the underlying stream is o
 calls to `writer.close()`.
 """
 
-import os, sys, threading, platform
+import os, sys, threading, platform, select
 
 class Writer:
 	def __init__(self,stream,count = None,lock_write = False):
@@ -132,18 +132,20 @@ class Writer:
 		reaches `0`, `stream.close()` is called."""
 		with self.lock:
 			self.count -= 1
-			if(self.count==0):
-				self.stream.close()
+			if self.count>0:
+				return
+		self.stream.close()
 	def locked_write(self,z):
 		with self.lock:
 			self.stream.write(z)
 
 class FDCapture:
-	def __init__(self,fd,writer,echo=True):
+	def __init__(self,fd,writer,echo=True,magic=b'\x04\x00\x08\x20'):
 		"""`FDCapture` constructor."""
 		if(hasattr(writer,'writer_open')):
 			writer.writer_open()
-		(self.active, self.writer, self.fd, self.echo) = (True,writer,fd,echo)
+		(self.active, self.writer, self.fd, self.echo, self.magic) = (True,writer,fd,echo,magic)
+		self.write = (lambda data: self.writer.write_from(data,self)) if hasattr(writer,'write_from') else writer.write
 		(self.pipe_read_fd, self.pipe_write_fd) = os.pipe()
 		self.dup_fd = os.dup(fd)
 		os.dup2(self.pipe_write_fd,fd)
@@ -152,11 +154,16 @@ class FDCapture:
 	def printer(self):
 		"""This is the thread that listens to the pipe output and passes it to the writer stream."""
 		try:
-			while True:
+			looping = True
+			while looping:
 				data = os.read(self.pipe_read_fd,100000)
-				if(len(data)==0):
+				foo = data.split(self.magic)
+				data = foo[0]
+				if len(foo)>=2:
+					looping = False
+				if len(data)==0:
 					break
-				self.writer.write_from(data,self)
+				self.write(data)
 				if self.echo:
 					os.write(self.dup_fd,data)
 		finally:
@@ -168,8 +175,10 @@ class FDCapture:
 		if not self.active:
 			return
 		self.active = False
+		os.write(self.fd,self.magic)
 		os.dup2(self.dup_fd,self.fd)
 		os.close(self.pipe_write_fd)
+		self.thread.join()
 	def __enter__(self):
 		return self
 	def __exit__(self,a,b,c):

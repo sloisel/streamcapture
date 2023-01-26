@@ -220,7 +220,7 @@ of the `streamcapture.Writer` was set to `2`, so that the underlying stream is o
 calls to `writer.close()`.
 &#34;&#34;&#34;
 
-import os, sys, threading, platform
+import os, sys, threading, platform, select
 
 class Writer:
         def __init__(self,stream,count = None,lock_write = False):
@@ -243,18 +243,20 @@ class Writer:
                 reaches `0`, `stream.close()` is called.&#34;&#34;&#34;
                 with self.lock:
                         self.count -= 1
-                        if(self.count==0):
-                                self.stream.close()
+                        if self.count&gt;0:
+                                return
+                self.stream.close()
         def locked_write(self,z):
                 with self.lock:
                         self.stream.write(z)
 
 class FDCapture:
-        def __init__(self,fd,writer,echo=True):
+        def __init__(self,fd,writer,echo=True,magic=b&#39;\x04\x00\x08\x20&#39;):
                 &#34;&#34;&#34;`FDCapture` constructor.&#34;&#34;&#34;
                 if(hasattr(writer,&#39;writer_open&#39;)):
                         writer.writer_open()
-                (self.active, self.writer, self.fd, self.echo) = (True,writer,fd,echo)
+                (self.active, self.writer, self.fd, self.echo, self.magic) = (True,writer,fd,echo,magic)
+                self.write = (lambda data: self.writer.write_from(data,self)) if hasattr(writer,&#39;write_from&#39;) else writer.write
                 (self.pipe_read_fd, self.pipe_write_fd) = os.pipe()
                 self.dup_fd = os.dup(fd)
                 os.dup2(self.pipe_write_fd,fd)
@@ -263,11 +265,16 @@ class FDCapture:
         def printer(self):
                 &#34;&#34;&#34;This is the thread that listens to the pipe output and passes it to the writer stream.&#34;&#34;&#34;
                 try:
-                        while True:
+                        looping = True
+                        while looping:
                                 data = os.read(self.pipe_read_fd,100000)
-                                if(len(data)==0):
+                                foo = data.split(self.magic)
+                                data = foo[0]
+                                if len(foo)&gt;=2:
+                                        looping = False
+                                if len(data)==0:
                                         break
-                                self.writer.write_from(data,self)
+                                self.write(data)
                                 if self.echo:
                                         os.write(self.dup_fd,data)
                 finally:
@@ -279,8 +286,10 @@ class FDCapture:
                 if not self.active:
                         return
                 self.active = False
+                os.write(self.fd,self.magic)
                 os.dup2(self.dup_fd,self.fd)
                 os.close(self.pipe_write_fd)
+                self.thread.join()
         def __enter__(self):
                 return self
         def __exit__(self,a,b,c):
@@ -318,7 +327,7 @@ class StreamCapture:
 <dl>
 <dt id="streamcapture.FDCapture"><code class="flex name class">
 <span>class <span class="ident">FDCapture</span></span>
-<span>(</span><span>fd, writer, echo=True)</span>
+<span>(</span><span>fd, writer, echo=True, magic=b'\x04\x00\x08 ')</span>
 </code></dt>
 <dd>
 <div class="desc"><p><code><a title="streamcapture.FDCapture" href="#streamcapture.FDCapture">FDCapture</a></code> constructor.</p></div>
@@ -327,11 +336,12 @@ class StreamCapture:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class FDCapture:
-        def __init__(self,fd,writer,echo=True):
+        def __init__(self,fd,writer,echo=True,magic=b&#39;\x04\x00\x08\x20&#39;):
                 &#34;&#34;&#34;`FDCapture` constructor.&#34;&#34;&#34;
                 if(hasattr(writer,&#39;writer_open&#39;)):
                         writer.writer_open()
-                (self.active, self.writer, self.fd, self.echo) = (True,writer,fd,echo)
+                (self.active, self.writer, self.fd, self.echo, self.magic) = (True,writer,fd,echo,magic)
+                self.write = (lambda data: self.writer.write_from(data,self)) if hasattr(writer,&#39;write_from&#39;) else writer.write
                 (self.pipe_read_fd, self.pipe_write_fd) = os.pipe()
                 self.dup_fd = os.dup(fd)
                 os.dup2(self.pipe_write_fd,fd)
@@ -340,11 +350,16 @@ class StreamCapture:
         def printer(self):
                 &#34;&#34;&#34;This is the thread that listens to the pipe output and passes it to the writer stream.&#34;&#34;&#34;
                 try:
-                        while True:
+                        looping = True
+                        while looping:
                                 data = os.read(self.pipe_read_fd,100000)
-                                if(len(data)==0):
+                                foo = data.split(self.magic)
+                                data = foo[0]
+                                if len(foo)&gt;=2:
+                                        looping = False
+                                if len(data)==0:
                                         break
-                                self.writer.write_from(data,self)
+                                self.write(data)
                                 if self.echo:
                                         os.write(self.dup_fd,data)
                 finally:
@@ -356,8 +371,10 @@ class StreamCapture:
                 if not self.active:
                         return
                 self.active = False
+                os.write(self.fd,self.magic)
                 os.dup2(self.dup_fd,self.fd)
                 os.close(self.pipe_write_fd)
+                self.thread.join()
         def __enter__(self):
                 return self
         def __exit__(self,a,b,c):
@@ -379,8 +396,10 @@ class StreamCapture:
         if not self.active:
                 return
         self.active = False
+        os.write(self.fd,self.magic)
         os.dup2(self.dup_fd,self.fd)
-        os.close(self.pipe_write_fd)</code></pre>
+        os.close(self.pipe_write_fd)
+        self.thread.join()</code></pre>
 </details>
 </dd>
 <dt id="streamcapture.FDCapture.printer"><code class="name flex">
@@ -395,11 +414,16 @@ class StreamCapture:
 <pre><code class="python">def printer(self):
         &#34;&#34;&#34;This is the thread that listens to the pipe output and passes it to the writer stream.&#34;&#34;&#34;
         try:
-                while True:
+                looping = True
+                while looping:
                         data = os.read(self.pipe_read_fd,100000)
-                        if(len(data)==0):
+                        foo = data.split(self.magic)
+                        data = foo[0]
+                        if len(foo)&gt;=2:
+                                looping = False
+                        if len(data)==0:
                                 break
-                        self.writer.write_from(data,self)
+                        self.write(data)
                         if self.echo:
                                 os.write(self.dup_fd,data)
         finally:
@@ -492,8 +516,9 @@ class StreamCapture:
                 reaches `0`, `stream.close()` is called.&#34;&#34;&#34;
                 with self.lock:
                         self.count -= 1
-                        if(self.count==0):
-                                self.stream.close()
+                        if self.count&gt;0:
+                                return
+                self.stream.close()
         def locked_write(self,z):
                 with self.lock:
                         self.stream.write(z)</code></pre>
@@ -517,8 +542,9 @@ reaches <code>0</code>, <code>stream.close()</code> is called.</p></div>
         reaches `0`, `stream.close()` is called.&#34;&#34;&#34;
         with self.lock:
                 self.count -= 1
-                if(self.count==0):
-                        self.stream.close()</code></pre>
+                if self.count&gt;0:
+                        return
+        self.stream.close()</code></pre>
 </details>
 </dd>
 <dt id="streamcapture.Writer.locked_write"><code class="name flex">
