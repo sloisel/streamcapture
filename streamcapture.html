@@ -251,7 +251,7 @@ class Writer:
                         self.stream.write(z)
 
 class FDCapture:
-        def __init__(self,fd,writer,echo=True,magic=b&#39;\x04\x00\x08\x20&#39;):
+        def __init__(self,fd,writer,echo=True,magic=b&#39;\x04\x81\x00\xff&#39;):
                 &#34;&#34;&#34;`FDCapture` constructor.&#34;&#34;&#34;
                 if(hasattr(writer,&#39;writer_open&#39;)):
                         writer.writer_open()
@@ -327,7 +327,7 @@ class StreamCapture:
 <dl>
 <dt id="streamcapture.FDCapture"><code class="flex name class">
 <span>class <span class="ident">FDCapture</span></span>
-<span>(</span><span>fd, writer, echo=True, magic=b'\x04\x00\x08 ')</span>
+<span>(</span><span>fd, writer, echo=True, magic=b'\x04\x81\x00\xff')</span>
 </code></dt>
 <dd>
 <div class="desc"><p><code><a title="streamcapture.FDCapture" href="#streamcapture.FDCapture">FDCapture</a></code> constructor.</p></div>
@@ -336,7 +336,7 @@ class StreamCapture:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class FDCapture:
-        def __init__(self,fd,writer,echo=True,magic=b&#39;\x04\x00\x08\x20&#39;):
+        def __init__(self,fd,writer,echo=True,magic=b&#39;\x04\x81\x00\xff&#39;):
                 &#34;&#34;&#34;`FDCapture` constructor.&#34;&#34;&#34;
                 if(hasattr(writer,&#39;writer_open&#39;)):
                         writer.writer_open()

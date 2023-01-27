@@ -140,7 +140,7 @@ class Writer:
 			self.stream.write(z)
 
 class FDCapture:
-	def __init__(self,fd,writer,echo=True,magic=b'\x04\x00\x08\x20'):
+	def __init__(self,fd,writer,echo=True,magic=b'\x04\x81\x00\xff'):
 		"""`FDCapture` constructor."""
 		if(hasattr(writer,'writer_open')):
 			writer.writer_open()
