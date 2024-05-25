@@ -27,5 +27,8 @@ pypi: all
 
 test/logfile.txt: test/test1.py streamcapture/__init__.py Makefile
 	cd test && ../scripts/python test1.py && diff logfile.txt logfile.gold
+	cd test && ../scripts/python test3.repeating.py
+	cd test && ../scripts/python test4.fast_open_close.py
+	cd test && ../scripts/python test5.multi_capture_to_same_buffer.py
 
 test: test/logfile.txt
