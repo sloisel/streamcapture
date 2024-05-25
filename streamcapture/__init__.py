@@ -158,17 +158,19 @@ class FDCapture:
 			while looping:
 				data = os.read(self.pipe_read_fd,100000)
 				foo = data.split(self.magic)
-				data = foo[0]
+
 				if len(foo)>=2:
 					looping = False
-				if len(data)==0:
-					break
-				self.write(data)
-				if self.echo:
-					os.write(self.dup_fd,data)
+
+				for segment in foo:
+					if len(segment) == 0:
+						# Pipe is closed
+						looping = False
+						break
+					self.write(segment)
+					if self.echo:
+						os.write(self.dup_fd,segment)
 		finally:
-			self.writer.close()
-			os.close(self.dup_fd)
 			os.close(self.pipe_read_fd)
 	def close(self):
 		"""When you want to "uncapture" a stream, use this method."""
@@ -176,9 +178,11 @@ class FDCapture:
 			return
 		self.active = False
 		os.write(self.fd,self.magic)
+		self.thread.join()
 		os.dup2(self.dup_fd,self.fd)
 		os.close(self.pipe_write_fd)
-		self.thread.join()
+		os.close(self.dup_fd)
+
 	def __enter__(self):
 		return self
 	def __exit__(self,a,b,c):
