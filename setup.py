@@ -9,7 +9,10 @@ setup(
     description='Capture output streams such as sys.stdout and sys.stderr.',
     version='1.2.3',
     packages=find_packages(),
-    install_requires=['setuptools', 'pdoc3>=0.7'],
+    install_requires=['setuptools'],
+    extras_require={
+        "doc": ['pdoc3>=0.7'],
+    },
     python_requires='>=3',
     author='Sébastien Loisel',
     author_email='sloisel@gmail.com',
