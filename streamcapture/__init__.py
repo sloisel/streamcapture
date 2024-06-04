@@ -196,7 +196,7 @@ class StreamCapture:
 		self.monkeypatch = platform.system()=='Windows' if monkeypatch is None else monkeypatch
 		if self.monkeypatch:
 			self.oldwrite = stream.write
-			stream.write = lambda z: os.write(stream.fileno(),z.encode() if hasattr(z,'encode') else z)
+			stream.buffer.write = lambda z: os.write(stream.fileno(), z)
 	def close(self):
 		"""When you want to "uncapture" a stream, use this method."""
 		self.stream.flush()

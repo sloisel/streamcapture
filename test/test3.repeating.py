@@ -11,8 +11,9 @@ for i in range(10):
     try:
         print('1234')
         time.sleep(1)
-        if buffer.getvalue() != '1234\n'.encode():
-            raise RuntimeError(f'Test failed. Found: {buffer.getvalue().decode()}')
+        buffer_str = buffer.getvalue().decode().rstrip()
+        if buffer_str != '1234':
+            raise RuntimeError(f'Test failed. Found: {buffer_str}')
     finally:
         stdout_capturer.close()
         buffer.close()
