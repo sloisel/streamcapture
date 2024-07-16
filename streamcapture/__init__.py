@@ -115,7 +115,13 @@ from typing import Optional, Callable, Union, Type, TextIO
 
 
 class Writer:
-    def __init__(self, stream: io.IOBase, count=None, lock_write=False):
+    stream: io.IOBase
+    count: int
+    increment: int
+    lock: threading.Lock
+    _write: Callable[[bytes], None]
+
+    def __init__(self, stream: io.IOBase, count: Optional[int] = None, lock_write: bool = False):
         """`Writer` constructor.
 
         Wrapper of a stream to which bytes may be written. Introduces an optional lock for which write which
@@ -143,8 +149,8 @@ class Writer:
 
     def writer_open(self) -> None:
         """Register that the writer is used."""
-    with self.lock:
-        self.count += self.increment
+        with self.lock:
+            self.count += self.increment
 
     def close(self) -> None:
         """Closes the writer and the underlying stream
@@ -227,6 +233,7 @@ class FDCapture:
                 for segment in foo:
                     # Pipe is closed
                     if len(segment) == 0:
+                        looping = False
                         break
                     self.write(segment)
                     if self.echo:
