@@ -3,6 +3,8 @@
 
 ### Author: Sébastien Loisel
 
+[![codecov](https://codecov.io/gh/sloisel/streamcapture/graph/badge.svg?token=NO478ARVX6)](https://codecov.io/gh/sloisel/streamcapture)
+
 # Installation
 
 `pip install streamcapture`
