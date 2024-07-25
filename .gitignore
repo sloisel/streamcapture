@@ -1,6 +1,6 @@
 *.pickle
 *.log
-*.txt
+logfile.txt
 *.egg-info
 *~
 *.orig

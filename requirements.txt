@@ -1,0 +1,4 @@
+setuptools
+pdoc3>=0.7
+pytest
+pytest-cov
