@@ -21,6 +21,7 @@ jobs:
           python-version: '3.x'
       - run: python -m pip install --upgrade pip
       - run: pip install -r requirements.txt
+      - run: pip install .
       - name: Run tests and collect coverage
         run: pytest --cov test/ ${{ env.CODECOV_ATS_TESTS }}
       - name: Upload coverage to Codecov
