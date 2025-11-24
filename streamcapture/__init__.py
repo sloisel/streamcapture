@@ -185,11 +185,9 @@ class FDCapture:
     writer: Union[io.IOBase, Writer]
     fd: int
     echo: bool
-    magic: bytes
     write: Callable[[bytes], int]
 
     pipe_read_fd: int
-    pipe_write_fd: int
     dup_fd: int
     """Placeholder filedescriptor where the stream originally wrote to."""
     thread: threading.Thread
@@ -199,49 +197,41 @@ class FDCapture:
             fd: int,
             writer: Union[io.IOBase, Writer],
             echo: bool,
-            magic: bytes = b"\x04\x81\x00\xff",
     ):
         """`FDCapture` constructor.
 
         :param fd: The filedescriptor to capture.
         :param writer: Any bytes received from `fd` are written to this writer.
         :param echo: Enable to also write bytes received to `fd` as well.
-        :param magic: The magic packet which denotes that the capturing process should stop.
         """
         if hasattr(writer, "writer_open"):
             writer.writer_open()
-        (self.active, self.writer, self.fd, self.echo, self.magic) = (True, writer, fd, echo, magic)
+        (self.active, self.writer, self.fd, self.echo) = (True, writer, fd, echo)
         self.write = (
             (lambda data: self.writer.write_from(data, self))  # type: ignore[union-attr, assignment]
             if hasattr(writer, "write_from")
             else writer.write
         )
-        (self.pipe_read_fd, self.pipe_write_fd) = os.pipe()
+        (pipe_read_fd, pipe_write_fd) = os.pipe()
+        self.pipe_read_fd = pipe_read_fd
         self.dup_fd = os.dup(fd)
-        os.dup2(self.pipe_write_fd, fd)
+        os.dup2(pipe_write_fd, fd)
+        # Critical: Close pipe_write_fd immediately after dup2 to prevent subprocess inheritance
+        os.close(pipe_write_fd)
         self.thread = threading.Thread(target=self.printer)
         self.thread.start()
 
     def printer(self):
         """This is the thread that listens to the pipe output and passes it to the writer stream."""
         try:
-            looping = True
-            while looping:
+            while True:
                 data = os.read(self.pipe_read_fd, 100000)
-                foo = data.split(self.magic)
-
-                # magic segment was found in data
-                if len(foo) >= 2:
-                    looping = False
-
-                for segment in foo:
-                    # Pipe is closed
-                    if len(segment) == 0:
-                        looping = False
-                        break
-                    self.write(segment)
-                    if self.echo:
-                        os.write(self.dup_fd, segment)
+                if not data:
+                    # EOF - pipe is closed
+                    break
+                self.write(data)
+                if self.echo:
+                    os.write(self.dup_fd, data)
         finally:
             os.close(self.pipe_read_fd)
 
@@ -251,10 +241,12 @@ class FDCapture:
             return
         self.active = False
 
-        os.write(self.fd, self.magic)
-        self.thread.join()
+        # Restore original fd - this closes the last reference to the pipe write end
         os.dup2(self.dup_fd, self.fd)
-        os.close(self.pipe_write_fd)
+        
+        # Wait for the reader thread to receive EOF and finish
+        self.thread.join()
+        
         os.close(self.dup_fd)
 
     def __enter__(self):

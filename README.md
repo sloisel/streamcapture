@@ -6,6 +6,7 @@
 [![Build Status](https://github.com/sloisel/streamcapture/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/sloisel/streamcapture/actions/workflows/CI.yml?query=branch%3Amaster)
 [![codecov](https://codecov.io/gh/sloisel/streamcapture/graph/badge.svg?token=NO478ARVX6)](https://codecov.io/gh/sloisel/streamcapture)
 
+
 # Installation
 
 `pip install streamcapture`
@@ -45,7 +46,7 @@ redirected with `os.dup2`. `StreamCapture` features an optional workaround, enab
 `monkeypatch` optional parameter to the constructor. When enabled, the workaround
 overwrites `stream.write(...)` by an implementation that sends everything to `os.write(self.fd,...)`.
 This workaround is enabled when `monkeypatch=True` and disabled when `monkeypatch=False`.
-The default is `monkeypatch=None`, in which case monkeypatching is enabled only when 
+The default is `monkeypatch=None`, in which case monkeypatching is enabled only when
 `platform.system()=='Windows'`.
 
 When writing to multiple streams and file descriptors, sometimes the order in which the writes
@@ -102,8 +103,8 @@ Example usage:
 import sys, streamcapture
 writer = streamcapture.Writer(open('logfile.txt','wb'),2)
 with streamcapture.StreamCapture(sys.stdout,writer), streamcapture.StreamCapture(sys.stderr,writer):
-	print("This goes to stdout and is captured to logfile.txt")
-	print("This goes to stderr and is also captured to logfile.txt",file=sys.stderr)
+    print("This goes to stdout and is captured to logfile.txt")
+    print("This goes to stderr and is also captured to logfile.txt",file=sys.stderr)
 ```
 
 In the above example, writer will be closed twice: once from the `StreamCapture(sys.stdout,...)`

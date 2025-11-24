@@ -2,18 +2,32 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.10.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
 <title>streamcapture API documentation</title>
-<meta name="description" content="streamcapture: capture the outputs of Python streams, such as sys.stdout and sys.stderr …" />
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
-<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
-<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
-<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
-<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<meta name="description" content="streamcapture: capture the outputs of Python streams, such as sys.stdout and sys.stderr …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
 <style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
-<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
 </head>
 <body>
 <main>
@@ -91,234 +105,20 @@ only when all threads have called <code>close</code>. <code><a title="streamcapt
 <p><code>count</code>: is the number of times that <code><a title="streamcapture.Writer.close" href="#streamcapture.Writer.close">Writer.close()</a></code> will be called before the writer
 is finally closed. This is so that a single stream can be used from multiple threads.</p>
 <p><code>lock_write</code>: set this to <code>True</code> if you want calls to <code>stream.write()</code> to be serialized.
-This causes <code>Writer.write</code> to acquire <code>Writer.lock</code> before calling <code>stream.write</code>.
-If <code>lock_write=False</code> then <code>Writer.lock</code> is not acquired. Use this when <code>stream.write</code> is
+This causes <code>Writer.write</code> to acquire <code><a title="streamcapture.Writer.lock" href="#streamcapture.Writer.lock">Writer.lock</a></code> before calling <code>stream.write</code>.
+If <code>lock_write=False</code> then <code><a title="streamcapture.Writer.lock" href="#streamcapture.Writer.lock">Writer.lock</a></code> is not acquired. Use this when <code>stream.write</code> is
 thread-safe. <code>lock_write=False</code> is the default.</p>
 <p>Example usage:</p>
 <pre><code class="language-python">import sys, streamcapture
 writer = streamcapture.Writer(open('logfile.txt','wb'),2)
 with streamcapture.StreamCapture(sys.stdout,writer), streamcapture.StreamCapture(sys.stderr,writer):
-        print(&quot;This goes to stdout and is captured to logfile.txt&quot;)
-        print(&quot;This goes to stderr and is also captured to logfile.txt&quot;,file=sys.stderr)
+    print(&quot;This goes to stdout and is captured to logfile.txt&quot;)
+    print(&quot;This goes to stderr and is also captured to logfile.txt&quot;,file=sys.stderr)
 </code></pre>
 <p>In the above example, writer will be closed twice: once from the <code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a>(sys.stdout,&hellip;)</code>
 object, and once from the <code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a>(sys.stderr,&hellip;)</code> object. Correspondingly, the <code>count</code> parameter
 of the <code><a title="streamcapture.Writer" href="#streamcapture.Writer">Writer</a></code> was set to <code>2</code>, so that the underlying stream is only closed after 2
 calls to <code>writer.close()</code>.</p>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">r&#34;&#34;&#34;
-## streamcapture: capture the outputs of Python streams, such as sys.stdout and sys.stderr
-
-### Author: Sébastien Loisel
-
-# Installation
-
-`pip install streamcapture`
-
-# Example usage
-
-```python
-import streamcapture, sys, os
-print(&#34;This does not get saved to the log file&#34;)
-with streamcapture.StreamCapture(sys.stdout,open(&#39;logfile.txt&#39;,&#39;wb&#39;)):
-        os.write(sys.stdout.fileno(),b&#34;Hello, captured world!\n&#34;)
-        os.system(&#39;echo Hello from the shell&#39;)
-        print(&#34;More capturing&#34;)
-print(&#34;This also does not get saved to the log file&#34;)
-```
-
-After execution, this will create a file `logfile.txt` in the current directory, containing
-the relevant captured outputs.
-
-# Documentation
-
-Class `StreamCapture(stream, writer, echo=True, monkeypatch=None)` is able to capture,
-at the operating system level, the data being written to the given `stream`.
-A typical use is to capture all outputs to `sys.stdout` and `sys.stderr`
-and log them to a file. This will even capture the outputs of spawned shell commands.
-
-`StreamCapture` works by essentially using `os.dup2` to send `stream.fileno()` to a `os.pipe()`.
-A separate thread is used to listen to that `os.pipe` and send the outputs to the destination
-`writer` stream. `StreamCapture` also uses `os.dup` to duplicate the original filedescriptor to be able
-to restore it at the end. This duplicated filedescriptor is stored in `StreamCapture.dup_fd`, and
-writing to this filedescriptor results in writing to the original file, before it was redirected.
-For example, when redirecting `sys.stdout`, one can still write to the terminal by writing directly
-to `StreamCapture.dup_fd` with `os.write()`.
-
-On Windows, `sys.stdout` and `sys.stderr` do not take kindly to their `fileno()` being
-redirected with `os.dup2`. `StreamCapture` features an optional workaround, enabled by the
-`monkeypatch` optional parameter to the constructor. When enabled, the workaround
-overwrites `stream.write(...)` by an implementation that sends everything to `os.write(self.fd,...)`.
-This workaround is enabled when `monkeypatch=True` and disabled when `monkeypatch=False`.
-The default is `monkeypatch=None`, in which case monkeypatching is enabled only when 
-`platform.system()==&#39;Windows&#39;`.
-
-When writing to multiple streams and file descriptors, sometimes the order in which the writes
-appear can be surprising. For example, when writing to stderr and stdout, these outputs do not
-necessarily appear in the order in which they occurred during the program execution, because
-of various levels of buffering that occur in Python, the C library or the operating system.
-
-At the Python level, streams can be `flush()`ed to attempt to reduce the delay before a `write()`
-has delivered its payload. Furthermore, `os.fsync()` can be used on some, but not all, file descriptors.
-However, `os.fsync()` usually causes an exception if it is called on `sys.stdout.fileno()` or on a
-`os.pipe()`. In principle, the operating system should promtly flush any buffers when a file descriptor
-is `os.close()`d, but there is no guarantee. To complicate matters, although one usually prefers minimal
-buffering for outputs that go to the console, Python tries very hard to force some sort of buffering on
-text-mode files.
-
-We have tried to prevent most forms of buffering at the Python level and at the operating system levels,
-but when multiple file descriptors are used, or at the boundary when a `StreamCapture` starts or stops
-capturing the underlying stream, some outputs that go to the console may appear in an unexpected order.
-
-More sophisticated behaviors can be handled by implementing a custom stream-like object.
-The `writer` object should implement functions `writer.write(data)`, where `data` is a byte string,
-and `writer.close()`.
-
-The `echo` flag can be set at construction time `StreamCapture(...,echo=True)` and defaults to `True`.
-In this mode, all captured outputs are sent both to the `writer` and also to `StreamCapture.dup_fd`.
-This allows one to send, e.g. `stdout` to a log file while simultaneously printing it to the console,
-similar to the `tee` console command in Unix. The `echo` flag can be set to `False` to disable this.
-
-One can call `StreamCapture.close()` to cleanly unwind the captured streams. This is automatically
-done if `StreamCapture` is used in a `with` block.
-
-One may also wish to capture a filedescriptor without the overhead of a wrapping Python stream.
-To that end, one may use `FDCapture(fd,writer,echo=True)`. The parameter `fd` is an integer filedescriptor
-to be captured. `StreamCapture` is a thin wrapper around `FDCapture`, it mainly adds the monkeypatching
-capability.
-
-`streamcapture.Writer` is a thin wrapper around an underlying stream, that allows sharing a stream
-between multiple threads in a thread-safe manner, guaranteeing that the underlying stream is closed
-only when all threads have called `close`. `Writer` objects are constructed by
-`streamcapture.Writer(stream,count,lock_write = False)`.
-
-`stream`: is a stream that is being wrapped, e.g. `stream = open(&#39;logfile.txt&#39;,&#39;wb&#39;)`
-
-`count`: is the number of times that `Writer.close()` will be called before the writer
-is finally closed. This is so that a single stream can be used from multiple threads.
-
-`lock_write`: set this to `True` if you want calls to `stream.write()` to be serialized.
-This causes `Writer.write` to acquire `Writer.lock` before calling `stream.write`.
-If `lock_write=False` then `Writer.lock` is not acquired. Use this when `stream.write` is
-thread-safe. `lock_write=False` is the default.
-
-Example usage:
-```python
-import sys, streamcapture
-writer = streamcapture.Writer(open(&#39;logfile.txt&#39;,&#39;wb&#39;),2)
-with streamcapture.StreamCapture(sys.stdout,writer), streamcapture.StreamCapture(sys.stderr,writer):
-        print(&#34;This goes to stdout and is captured to logfile.txt&#34;)
-        print(&#34;This goes to stderr and is also captured to logfile.txt&#34;,file=sys.stderr)
-```
-
-In the above example, writer will be closed twice: once from the `StreamCapture(sys.stdout,...)`
-object, and once from the `StreamCapture(sys.stderr,...)` object. Correspondingly, the `count` parameter
-of the `streamcapture.Writer` was set to `2`, so that the underlying stream is only closed after 2
-calls to `writer.close()`.
-&#34;&#34;&#34;
-
-import os, sys, threading, platform, select
-
-class Writer:
-        def __init__(self,stream,count = None,lock_write = False):
-                &#34;&#34;&#34;`Writer` constructor.&#34;&#34;&#34;
-                (self.stream,self.lock_write) = (stream,lock_write)
-                if count is None:
-                        (self.count,self.increment) = (0,1)
-                else:
-                        (self.count,self.increment) = (count,0)
-                self.lock = threading.Lock()
-                self._write = self.locked_write if lock_write else stream.write
-        def write_from(self,data,cap):
-                self._write(data)
-        def writer_open(self):
-                with self.lock:
-                        self.count += self.increment
-        def close(self):
-                &#34;&#34;&#34;When one is done using a `Writer`, one calls `Writer.close()`. This acquires `Writer.lock` so it is
-                thread-safe. Each time `Writer.close()` is called, `Writer.count` is decremented. When `Writer.count`
-                reaches `0`, `stream.close()` is called.&#34;&#34;&#34;
-                with self.lock:
-                        self.count -= 1
-                        if self.count&gt;0:
-                                return
-                self.stream.close()
-        def locked_write(self,z):
-                with self.lock:
-                        self.stream.write(z)
-
-class FDCapture:
-        def __init__(self,fd,writer,echo=True,magic=b&#39;\x04\x81\x00\xff&#39;):
-                &#34;&#34;&#34;`FDCapture` constructor.&#34;&#34;&#34;
-                if(hasattr(writer,&#39;writer_open&#39;)):
-                        writer.writer_open()
-                (self.active, self.writer, self.fd, self.echo, self.magic) = (True,writer,fd,echo,magic)
-                self.write = (lambda data: self.writer.write_from(data,self)) if hasattr(writer,&#39;write_from&#39;) else writer.write
-                (self.pipe_read_fd, self.pipe_write_fd) = os.pipe()
-                self.dup_fd = os.dup(fd)
-                os.dup2(self.pipe_write_fd,fd)
-                self.thread = threading.Thread(target=self.printer)
-                self.thread.start()
-        def printer(self):
-                &#34;&#34;&#34;This is the thread that listens to the pipe output and passes it to the writer stream.&#34;&#34;&#34;
-                try:
-                        looping = True
-                        while looping:
-                                data = os.read(self.pipe_read_fd,100000)
-                                foo = data.split(self.magic)
-
-                                if len(foo)&gt;=2:
-                                        looping = False
-
-                                for segment in foo:
-                                        if len(segment) == 0:
-                                                # Pipe is closed
-                                                looping = False
-                                                break
-                                        self.write(segment)
-                                        if self.echo:
-                                                os.write(self.dup_fd,segment)
-                finally:
-                        os.close(self.pipe_read_fd)
-        def close(self):
-                &#34;&#34;&#34;When you want to &#34;uncapture&#34; a stream, use this method.&#34;&#34;&#34;
-                if not self.active:
-                        return
-                self.active = False
-                os.write(self.fd,self.magic)
-                self.thread.join()
-                os.dup2(self.dup_fd,self.fd)
-                os.close(self.pipe_write_fd)
-                os.close(self.dup_fd)
-
-        def __enter__(self):
-                return self
-        def __exit__(self,a,b,c):
-                self.close()
-
-class StreamCapture:
-        def __init__(self,stream,writer,echo=True,monkeypatch=None):
-                &#34;&#34;&#34;The `StreamCapture` constructor.&#34;&#34;&#34;
-                self.fdcapture = FDCapture(stream.fileno(),writer,echo)
-                self.stream = stream
-                self.monkeypatch = platform.system()==&#39;Windows&#39; if monkeypatch is None else monkeypatch
-                if self.monkeypatch:
-                        self.oldwrite = stream.write
-                        stream.write = lambda z: os.write(stream.fileno(),z.encode() if hasattr(z,&#39;encode&#39;) else z)
-        def close(self):
-                &#34;&#34;&#34;When you want to &#34;uncapture&#34; a stream, use this method.&#34;&#34;&#34;
-                self.stream.flush()
-                self.fdcapture.close()
-                if self.monkeypatch:
-                        self.stream.write = self.oldwrite
-        def __enter__(self):
-                return self
-        def __exit__(self,a,b,c):
-                self.close()</code></pre>
-</details>
 </section>
 <section>
 </section>
@@ -331,273 +131,510 @@ class StreamCapture:
 <dl>
 <dt id="streamcapture.FDCapture"><code class="flex name class">
 <span>class <span class="ident">FDCapture</span></span>
-<span>(</span><span>fd, writer, echo=True, magic=b'\x04\x81\x00\xff')</span>
+<span>(</span><span>fd: int,<br>writer: io.IOBase | <a title="streamcapture.Writer" href="#streamcapture.Writer">Writer</a>,<br>echo: bool,<br>magic: bytes = b'\x04\x81\x00\xff')</span>
 </code></dt>
 <dd>
-<div class="desc"><p><code><a title="streamcapture.FDCapture" href="#streamcapture.FDCapture">FDCapture</a></code> constructor.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class FDCapture:
-        def __init__(self,fd,writer,echo=True,magic=b&#39;\x04\x81\x00\xff&#39;):
-                &#34;&#34;&#34;`FDCapture` constructor.&#34;&#34;&#34;
-                if(hasattr(writer,&#39;writer_open&#39;)):
-                        writer.writer_open()
-                (self.active, self.writer, self.fd, self.echo, self.magic) = (True,writer,fd,echo,magic)
-                self.write = (lambda data: self.writer.write_from(data,self)) if hasattr(writer,&#39;write_from&#39;) else writer.write
-                (self.pipe_read_fd, self.pipe_write_fd) = os.pipe()
-                self.dup_fd = os.dup(fd)
-                os.dup2(self.pipe_write_fd,fd)
-                self.thread = threading.Thread(target=self.printer)
-                self.thread.start()
-        def printer(self):
-                &#34;&#34;&#34;This is the thread that listens to the pipe output and passes it to the writer stream.&#34;&#34;&#34;
-                try:
-                        looping = True
-                        while looping:
-                                data = os.read(self.pipe_read_fd,100000)
-                                foo = data.split(self.magic)
+    &#34;&#34;&#34;Redirect all output from a file descriptor and write it to `writer`.&#34;&#34;&#34;
 
-                                if len(foo)&gt;=2:
-                                        looping = False
+    active: bool
+    writer: Union[io.IOBase, Writer]
+    fd: int
+    echo: bool
+    magic: bytes
+    write: Callable[[bytes], int]
 
-                                for segment in foo:
-                                        if len(segment) == 0:
-                                                # Pipe is closed
-                                                looping = False
-                                                break
-                                        self.write(segment)
-                                        if self.echo:
-                                                os.write(self.dup_fd,segment)
-                finally:
-                        os.close(self.pipe_read_fd)
-        def close(self):
-                &#34;&#34;&#34;When you want to &#34;uncapture&#34; a stream, use this method.&#34;&#34;&#34;
-                if not self.active:
-                        return
-                self.active = False
-                os.write(self.fd,self.magic)
-                self.thread.join()
-                os.dup2(self.dup_fd,self.fd)
-                os.close(self.pipe_write_fd)
-                os.close(self.dup_fd)
+    pipe_read_fd: int
+    pipe_write_fd: int
+    dup_fd: int
+    &#34;&#34;&#34;Placeholder filedescriptor where the stream originally wrote to.&#34;&#34;&#34;
+    thread: threading.Thread
 
-        def __enter__(self):
-                return self
-        def __exit__(self,a,b,c):
-                self.close()</code></pre>
+    def __init__(
+            self,
+            fd: int,
+            writer: Union[io.IOBase, Writer],
+            echo: bool,
+            magic: bytes = b&#34;\x04\x81\x00\xff&#34;,
+    ):
+        &#34;&#34;&#34;`FDCapture` constructor.
+
+        :param fd: The filedescriptor to capture.
+        :param writer: Any bytes received from `fd` are written to this writer.
+        :param echo: Enable to also write bytes received to `fd` as well.
+        :param magic: The magic packet which denotes that the capturing process should stop.
+        &#34;&#34;&#34;
+        if hasattr(writer, &#34;writer_open&#34;):
+            writer.writer_open()
+        (self.active, self.writer, self.fd, self.echo, self.magic) = (True, writer, fd, echo, magic)
+        self.write = (
+            (lambda data: self.writer.write_from(data, self))  # type: ignore[union-attr, assignment]
+            if hasattr(writer, &#34;write_from&#34;)
+            else writer.write
+        )
+        (self.pipe_read_fd, self.pipe_write_fd) = os.pipe()
+        self.dup_fd = os.dup(fd)
+        os.dup2(self.pipe_write_fd, fd)
+        self.thread = threading.Thread(target=self.printer)
+        self.thread.start()
+
+    def printer(self):
+        &#34;&#34;&#34;This is the thread that listens to the pipe output and passes it to the writer stream.&#34;&#34;&#34;
+        try:
+            looping = True
+            while looping:
+                data = os.read(self.pipe_read_fd, 100000)
+                foo = data.split(self.magic)
+
+                # magic segment was found in data
+                if len(foo) &gt;= 2:
+                    looping = False
+
+                for segment in foo:
+                    # Pipe is closed
+                    if len(segment) == 0:
+                        looping = False
+                        break
+                    self.write(segment)
+                    if self.echo:
+                        os.write(self.dup_fd, segment)
+        finally:
+            os.close(self.pipe_read_fd)
+
+    def close(self):
+        &#34;&#34;&#34;When you want to &#34;uncapture&#34; a stream, use this method.&#34;&#34;&#34;
+        if not self.active:
+            return
+        self.active = False
+
+        os.write(self.fd, self.magic)
+        self.thread.join()
+        os.dup2(self.dup_fd, self.fd)
+        os.close(self.pipe_write_fd)
+        os.close(self.dup_fd)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(
+            self,
+            exc_type: Optional[Type[BaseException]],
+            exc_val: Optional[BaseException],
+            exc_tb: Optional[TracebackType],
+    ) -&gt; None:
+        self.close()</code></pre>
 </details>
+<div class="desc"><p>Redirect all output from a file descriptor and write it to <code>writer</code>.</p>
+<p><code><a title="streamcapture.FDCapture" href="#streamcapture.FDCapture">FDCapture</a></code> constructor.</p>
+<p>:param fd: The filedescriptor to capture.
+:param writer: Any bytes received from <code>fd</code> are written to this writer.
+:param echo: Enable to also write bytes received to <code>fd</code> as well.
+:param magic: The magic packet which denotes that the capturing process should stop.</p></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="streamcapture.FDCapture.active"><code class="name">var <span class="ident">active</span> : bool</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="streamcapture.FDCapture.dup_fd"><code class="name">var <span class="ident">dup_fd</span> : int</code></dt>
+<dd>
+<div class="desc"><p>Placeholder filedescriptor where the stream originally wrote to.</p></div>
+</dd>
+<dt id="streamcapture.FDCapture.echo"><code class="name">var <span class="ident">echo</span> : bool</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="streamcapture.FDCapture.fd"><code class="name">var <span class="ident">fd</span> : int</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="streamcapture.FDCapture.magic"><code class="name">var <span class="ident">magic</span> : bytes</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="streamcapture.FDCapture.pipe_read_fd"><code class="name">var <span class="ident">pipe_read_fd</span> : int</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="streamcapture.FDCapture.pipe_write_fd"><code class="name">var <span class="ident">pipe_write_fd</span> : int</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="streamcapture.FDCapture.thread"><code class="name">var <span class="ident">thread</span> : threading.Thread</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="streamcapture.FDCapture.write"><code class="name">var <span class="ident">write</span> : Callable[[bytes], int]</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="streamcapture.FDCapture.writer"><code class="name">var <span class="ident">writer</span> : io.IOBase | <a title="streamcapture.Writer" href="#streamcapture.Writer">Writer</a></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="streamcapture.FDCapture.close"><code class="name flex">
 <span>def <span class="ident">close</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>When you want to "uncapture" a stream, use this method.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def close(self):
-        &#34;&#34;&#34;When you want to &#34;uncapture&#34; a stream, use this method.&#34;&#34;&#34;
-        if not self.active:
-                return
-        self.active = False
-        os.write(self.fd,self.magic)
-        self.thread.join()
-        os.dup2(self.dup_fd,self.fd)
-        os.close(self.pipe_write_fd)
-        os.close(self.dup_fd)</code></pre>
+    &#34;&#34;&#34;When you want to &#34;uncapture&#34; a stream, use this method.&#34;&#34;&#34;
+    if not self.active:
+        return
+    self.active = False
+
+    os.write(self.fd, self.magic)
+    self.thread.join()
+    os.dup2(self.dup_fd, self.fd)
+    os.close(self.pipe_write_fd)
+    os.close(self.dup_fd)</code></pre>
 </details>
+<div class="desc"><p>When you want to "uncapture" a stream, use this method.</p></div>
 </dd>
 <dt id="streamcapture.FDCapture.printer"><code class="name flex">
 <span>def <span class="ident">printer</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>This is the thread that listens to the pipe output and passes it to the writer stream.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def printer(self):
-        &#34;&#34;&#34;This is the thread that listens to the pipe output and passes it to the writer stream.&#34;&#34;&#34;
-        try:
-                looping = True
-                while looping:
-                        data = os.read(self.pipe_read_fd,100000)
-                        foo = data.split(self.magic)
+    &#34;&#34;&#34;This is the thread that listens to the pipe output and passes it to the writer stream.&#34;&#34;&#34;
+    try:
+        looping = True
+        while looping:
+            data = os.read(self.pipe_read_fd, 100000)
+            foo = data.split(self.magic)
 
-                        if len(foo)&gt;=2:
-                                looping = False
+            # magic segment was found in data
+            if len(foo) &gt;= 2:
+                looping = False
 
-                        for segment in foo:
-                                if len(segment) == 0:
-                                        # Pipe is closed
-                                        looping = False
-                                        break
-                                self.write(segment)
-                                if self.echo:
-                                        os.write(self.dup_fd,segment)
-        finally:
-                os.close(self.pipe_read_fd)</code></pre>
+            for segment in foo:
+                # Pipe is closed
+                if len(segment) == 0:
+                    looping = False
+                    break
+                self.write(segment)
+                if self.echo:
+                    os.write(self.dup_fd, segment)
+    finally:
+        os.close(self.pipe_read_fd)</code></pre>
 </details>
+<div class="desc"><p>This is the thread that listens to the pipe output and passes it to the writer stream.</p></div>
 </dd>
 </dl>
 </dd>
 <dt id="streamcapture.StreamCapture"><code class="flex name class">
 <span>class <span class="ident">StreamCapture</span></span>
-<span>(</span><span>stream, writer, echo=True, monkeypatch=None)</span>
+<span>(</span><span>stream_to_redirect: io.IOBase | <class 'TextIO'>,<br>writer: io.IOBase,<br>echo: bool = True,<br>monkeypatch: bool | None = None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>The <code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a></code> constructor.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class StreamCapture:
-        def __init__(self,stream,writer,echo=True,monkeypatch=None):
-                &#34;&#34;&#34;The `StreamCapture` constructor.&#34;&#34;&#34;
-                self.fdcapture = FDCapture(stream.fileno(),writer,echo)
-                self.stream = stream
-                self.monkeypatch = platform.system()==&#39;Windows&#39; if monkeypatch is None else monkeypatch
-                if self.monkeypatch:
-                        self.oldwrite = stream.write
-                        stream.write = lambda z: os.write(stream.fileno(),z.encode() if hasattr(z,&#39;encode&#39;) else z)
-        def close(self):
-                &#34;&#34;&#34;When you want to &#34;uncapture&#34; a stream, use this method.&#34;&#34;&#34;
-                self.stream.flush()
-                self.fdcapture.close()
-                if self.monkeypatch:
-                        self.stream.write = self.oldwrite
-        def __enter__(self):
-                return self
-        def __exit__(self,a,b,c):
-                self.close()</code></pre>
-</details>
-<h3>Methods</h3>
-<dl>
-<dt id="streamcapture.StreamCapture.close"><code class="name flex">
-<span>def <span class="ident">close</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>When you want to "uncapture" a stream, use this method.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def close(self):
+    &#34;&#34;&#34;Interface for users to redirect a stream to another `io.IOBase`&#34;&#34;&#34;
+
+    fdcapture: FDCapture
+    stream: Union[io.IOBase, TextIO]
+    monkeypatch: bool
+    oldwrite: Optional[Callable[[Union[bytes, str]], None]]
+
+    def __init__(
+            self,
+            stream_to_redirect: Union[io.IOBase, TextIO],
+            writer: io.IOBase,
+            echo: bool = True,
+            monkeypatch: Optional[bool] = None,
+    ) -&gt; None:
+        &#34;&#34;&#34;The `StreamCapture` constructor.
+
+        :param stream_to_redirect: Stream which will be redirected.
+        :param writer: The stream will be redirected to this writer. It must derive from io.IOBase.
+        :param echo: If the redirected stream should also write any output to the original stream.
+        :param monkeypatch: If monkeypatching is necessary. Default is None which will perform
+            the monkeypatch in case this is run on Windows. Otherwise, the value of monkeypatch
+            is used.
+        &#34;&#34;&#34;
+        self.fdcapture = FDCapture(stream_to_redirect.fileno(), writer, echo)
+        self.stream = stream_to_redirect
+        self.monkeypatch = platform.system() == &#34;Windows&#34; if monkeypatch is None else monkeypatch
+        if self.monkeypatch:
+            self.oldwrite = stream_to_redirect.write  # type: ignore[assignment]
+            stream_to_redirect.write = lambda z: os.write(  # type: ignore[method-assign]
+                stream_to_redirect.fileno(), z.encode() if hasattr(z, &#34;encode&#34;) else z
+            )
+        else:
+            self.oldwrite = None
+
+    def close(self) -&gt; None:
         &#34;&#34;&#34;When you want to &#34;uncapture&#34; a stream, use this method.&#34;&#34;&#34;
         self.stream.flush()
         self.fdcapture.close()
         if self.monkeypatch:
-                self.stream.write = self.oldwrite</code></pre>
+            self.stream.write = self.oldwrite  # type: ignore[assignment,method-assign]
+
+    def __enter__(self):
+        &#34;&#34;&#34;Start the stream redirect as a contextmanager.&#34;&#34;&#34;
+        return self
+
+    def __exit__(
+            self,
+            exc_type: Optional[Type[BaseException]],
+            exc_val: Optional[BaseException],
+            exc_tb: Optional[TracebackType],
+    ) -&gt; None:
+        &#34;&#34;&#34;Stop the stream redirect as a contextmanager.
+
+        Same as running StreamCapture.close()
+        &#34;&#34;&#34;
+        self.close()</code></pre>
 </details>
+<div class="desc"><p>Interface for users to redirect a stream to another <code>io.IOBase</code></p>
+<p>The <code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a></code> constructor.</p>
+<p>:param stream_to_redirect: Stream which will be redirected.
+:param writer: The stream will be redirected to this writer. It must derive from io.IOBase.
+:param echo: If the redirected stream should also write any output to the original stream.
+:param monkeypatch: If monkeypatching is necessary. Default is None which will perform
+the monkeypatch in case this is run on Windows. Otherwise, the value of monkeypatch
+is used.</p></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="streamcapture.StreamCapture.fdcapture"><code class="name">var <span class="ident">fdcapture</span> : <a title="streamcapture.FDCapture" href="#streamcapture.FDCapture">FDCapture</a></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="streamcapture.StreamCapture.monkeypatch"><code class="name">var <span class="ident">monkeypatch</span> : bool</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="streamcapture.StreamCapture.oldwrite"><code class="name">var <span class="ident">oldwrite</span> : Callable[[bytes | str], None] | None</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="streamcapture.StreamCapture.stream"><code class="name">var <span class="ident">stream</span> : io.IOBase | <class 'TextIO'></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="streamcapture.StreamCapture.close"><code class="name flex">
+<span>def <span class="ident">close</span></span>(<span>self) ‑> None</span>
+</code></dt>
+<dd>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def close(self) -&gt; None:
+    &#34;&#34;&#34;When you want to &#34;uncapture&#34; a stream, use this method.&#34;&#34;&#34;
+    self.stream.flush()
+    self.fdcapture.close()
+    if self.monkeypatch:
+        self.stream.write = self.oldwrite  # type: ignore[assignment,method-assign]</code></pre>
+</details>
+<div class="desc"><p>When you want to "uncapture" a stream, use this method.</p></div>
 </dd>
 </dl>
 </dd>
 <dt id="streamcapture.Writer"><code class="flex name class">
 <span>class <span class="ident">Writer</span></span>
-<span>(</span><span>stream, count=None, lock_write=False)</span>
+<span>(</span><span>stream: io.IOBase, count: int | None = None, lock_write: bool = False)</span>
 </code></dt>
 <dd>
-<div class="desc"><p><code><a title="streamcapture.Writer" href="#streamcapture.Writer">Writer</a></code> constructor.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Writer:
-        def __init__(self,stream,count = None,lock_write = False):
-                &#34;&#34;&#34;`Writer` constructor.&#34;&#34;&#34;
-                (self.stream,self.lock_write) = (stream,lock_write)
-                if count is None:
-                        (self.count,self.increment) = (0,1)
-                else:
-                        (self.count,self.increment) = (count,0)
-                self.lock = threading.Lock()
-                self._write = self.locked_write if lock_write else stream.write
-        def write_from(self,data,cap):
-                self._write(data)
-        def writer_open(self):
-                with self.lock:
-                        self.count += self.increment
-        def close(self):
-                &#34;&#34;&#34;When one is done using a `Writer`, one calls `Writer.close()`. This acquires `Writer.lock` so it is
-                thread-safe. Each time `Writer.close()` is called, `Writer.count` is decremented. When `Writer.count`
-                reaches `0`, `stream.close()` is called.&#34;&#34;&#34;
-                with self.lock:
-                        self.count -= 1
-                        if self.count&gt;0:
-                                return
-                self.stream.close()
-        def locked_write(self,z):
-                with self.lock:
-                        self.stream.write(z)</code></pre>
+    stream: io.IOBase
+    count: int
+    increment: int
+    lock: threading.Lock
+    _write: Callable[[bytes], int]
+
+    def __init__(self, stream: io.IOBase, count: Optional[int] = None, lock_write: bool = False):
+        &#34;&#34;&#34;`Writer` constructor.
+
+        Wrapper of a stream to which bytes may be written. Introduces an optional lock for which write which
+        may be enabled through `lock_write`.
+
+        :param stream: The stream to wrap.
+        :param count: The starting number of users of this writer.
+        :param lock_write: Grab the lock before each write operation.
+        &#34;&#34;&#34;
+        (self.stream, self.lock_write) = (stream, lock_write)
+        if count is None:
+            (self.count, self.increment) = (0, 1)
+        else:
+            (self.count, self.increment) = (count, 0)
+        self.lock = threading.Lock()
+        self._write = self.locked_write if lock_write else stream.write  # type: ignore[assignment]
+
+    def write_from(self, data: bytes, cap: &#39;FDCapture&#39;) -&gt; int:
+        &#34;&#34;&#34;Perform a write operation.
+
+        :param data: The bytes to write.
+        :param cap: Unused. Remains for legacy purposes.
+
+        :return: The amount of bytes written.
+        &#34;&#34;&#34;
+        return self._write(data)
+
+    def writer_open(self) -&gt; None:
+        &#34;&#34;&#34;Register that the writer is used.&#34;&#34;&#34;
+        with self.lock:
+            self.count += self.increment
+
+    def close(self) -&gt; None:
+        &#34;&#34;&#34;Closes the writer and the underlying stream
+
+        When one is done using a `Writer`, one calls `Writer.close()`. This acquires `Writer.lock` so it is
+        thread-safe. Each time `Writer.close()` is called, `Writer.count` is decremented. When `Writer.count`
+        reaches `0`, `stream.close()` is called.
+        &#34;&#34;&#34;
+        with self.lock:
+            self.count -= 1
+            if self.count &gt; 0:
+                return
+        self.stream.close()
+
+    def locked_write(self, z: bytes) -&gt; int:
+        &#34;&#34;&#34;Perform the write operation in a thread-safe manner.
+
+        :param z: Bytes to write.
+        :return: Return the amount of bytes written
+        &#34;&#34;&#34;
+        with self.lock:
+            written = self.stream.write(z)
+        return written</code></pre>
 </details>
+<div class="desc"><p><code><a title="streamcapture.Writer" href="#streamcapture.Writer">Writer</a></code> constructor.</p>
+<p>Wrapper of a stream to which bytes may be written. Introduces an optional lock for which write which
+may be enabled through <code>lock_write</code>.</p>
+<p>:param stream: The stream to wrap.
+:param count: The starting number of users of this writer.
+:param lock_write: Grab the lock before each write operation.</p></div>
+<h3>Class variables</h3>
+<dl>
+<dt id="streamcapture.Writer.count"><code class="name">var <span class="ident">count</span> : int</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="streamcapture.Writer.increment"><code class="name">var <span class="ident">increment</span> : int</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="streamcapture.Writer.lock"><code class="name">var <span class="ident">lock</span> : _thread.lock</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="streamcapture.Writer.stream"><code class="name">var <span class="ident">stream</span> : io.IOBase</code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="streamcapture.Writer.close"><code class="name flex">
-<span>def <span class="ident">close</span></span>(<span>self)</span>
+<span>def <span class="ident">close</span></span>(<span>self) ‑> None</span>
 </code></dt>
 <dd>
-<div class="desc"><p>When one is done using a <code><a title="streamcapture.Writer" href="#streamcapture.Writer">Writer</a></code>, one calls <code><a title="streamcapture.Writer.close" href="#streamcapture.Writer.close">Writer.close()</a></code>. This acquires <code>Writer.lock</code> so it is
-thread-safe. Each time <code><a title="streamcapture.Writer.close" href="#streamcapture.Writer.close">Writer.close()</a></code> is called, <code>Writer.count</code> is decremented. When <code>Writer.count</code>
-reaches <code>0</code>, <code>stream.close()</code> is called.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def close(self):
-        &#34;&#34;&#34;When one is done using a `Writer`, one calls `Writer.close()`. This acquires `Writer.lock` so it is
-        thread-safe. Each time `Writer.close()` is called, `Writer.count` is decremented. When `Writer.count`
-        reaches `0`, `stream.close()` is called.&#34;&#34;&#34;
-        with self.lock:
-                self.count -= 1
-                if self.count&gt;0:
-                        return
-        self.stream.close()</code></pre>
+<pre><code class="python">def close(self) -&gt; None:
+    &#34;&#34;&#34;Closes the writer and the underlying stream
+
+    When one is done using a `Writer`, one calls `Writer.close()`. This acquires `Writer.lock` so it is
+    thread-safe. Each time `Writer.close()` is called, `Writer.count` is decremented. When `Writer.count`
+    reaches `0`, `stream.close()` is called.
+    &#34;&#34;&#34;
+    with self.lock:
+        self.count -= 1
+        if self.count &gt; 0:
+            return
+    self.stream.close()</code></pre>
 </details>
+<div class="desc"><p>Closes the writer and the underlying stream</p>
+<p>When one is done using a <code><a title="streamcapture.Writer" href="#streamcapture.Writer">Writer</a></code>, one calls <code><a title="streamcapture.Writer.close" href="#streamcapture.Writer.close">Writer.close()</a></code>. This acquires <code><a title="streamcapture.Writer.lock" href="#streamcapture.Writer.lock">Writer.lock</a></code> so it is
+thread-safe. Each time <code><a title="streamcapture.Writer.close" href="#streamcapture.Writer.close">Writer.close()</a></code> is called, <code><a title="streamcapture.Writer.count" href="#streamcapture.Writer.count">Writer.count</a></code> is decremented. When <code><a title="streamcapture.Writer.count" href="#streamcapture.Writer.count">Writer.count</a></code>
+reaches <code>0</code>, <code>stream.close()</code> is called.</p></div>
 </dd>
 <dt id="streamcapture.Writer.locked_write"><code class="name flex">
-<span>def <span class="ident">locked_write</span></span>(<span>self, z)</span>
+<span>def <span class="ident">locked_write</span></span>(<span>self, z: bytes) ‑> int</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def locked_write(self,z):
-        with self.lock:
-                self.stream.write(z)</code></pre>
+<pre><code class="python">def locked_write(self, z: bytes) -&gt; int:
+    &#34;&#34;&#34;Perform the write operation in a thread-safe manner.
+
+    :param z: Bytes to write.
+    :return: Return the amount of bytes written
+    &#34;&#34;&#34;
+    with self.lock:
+        written = self.stream.write(z)
+    return written</code></pre>
 </details>
+<div class="desc"><p>Perform the write operation in a thread-safe manner.</p>
+<p>:param z: Bytes to write.
+:return: Return the amount of bytes written</p></div>
 </dd>
 <dt id="streamcapture.Writer.write_from"><code class="name flex">
-<span>def <span class="ident">write_from</span></span>(<span>self, data, cap)</span>
+<span>def <span class="ident">write_from</span></span>(<span>self,<br>data: bytes,<br>cap: <a title="streamcapture.FDCapture" href="#streamcapture.FDCapture">FDCapture</a>) ‑> int</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def write_from(self,data,cap):
-        self._write(data)</code></pre>
+<pre><code class="python">def write_from(self, data: bytes, cap: &#39;FDCapture&#39;) -&gt; int:
+    &#34;&#34;&#34;Perform a write operation.
+
+    :param data: The bytes to write.
+    :param cap: Unused. Remains for legacy purposes.
+
+    :return: The amount of bytes written.
+    &#34;&#34;&#34;
+    return self._write(data)</code></pre>
 </details>
+<div class="desc"><p>Perform a write operation.</p>
+<p>:param data: The bytes to write.
+:param cap: Unused. Remains for legacy purposes.</p>
+<p>:return: The amount of bytes written.</p></div>
 </dd>
 <dt id="streamcapture.Writer.writer_open"><code class="name flex">
-<span>def <span class="ident">writer_open</span></span>(<span>self)</span>
+<span>def <span class="ident">writer_open</span></span>(<span>self) ‑> None</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def writer_open(self):
-        with self.lock:
-                self.count += self.increment</code></pre>
+<pre><code class="python">def writer_open(self) -&gt; None:
+    &#34;&#34;&#34;Register that the writer is used.&#34;&#34;&#34;
+    with self.lock:
+        self.count += self.increment</code></pre>
 </details>
+<div class="desc"><p>Register that the writer is used.</p></div>
 </dd>
 </dl>
 </dd>
@@ -605,7 +642,6 @@ reaches <code>0</code>, <code>stream.close()</code> is called.</p></div>
 </section>
 </article>
 <nav id="sidebar">
-<h1>Index</h1>
 <div class="toc">
 <ul>
 <li><a href="#streamcapture-capture-the-outputs-of-python-streams-such-as-sysstdout-and-sysstderr">streamcapture: capture the outputs of Python streams, such as sys.stdout and sys.stderr</a><ul>
@@ -622,22 +658,40 @@ reaches <code>0</code>, <code>stream.close()</code> is called.</p></div>
 <ul>
 <li>
 <h4><code><a title="streamcapture.FDCapture" href="#streamcapture.FDCapture">FDCapture</a></code></h4>
-<ul class="">
+<ul class="two-column">
+<li><code><a title="streamcapture.FDCapture.active" href="#streamcapture.FDCapture.active">active</a></code></li>
 <li><code><a title="streamcapture.FDCapture.close" href="#streamcapture.FDCapture.close">close</a></code></li>
+<li><code><a title="streamcapture.FDCapture.dup_fd" href="#streamcapture.FDCapture.dup_fd">dup_fd</a></code></li>
+<li><code><a title="streamcapture.FDCapture.echo" href="#streamcapture.FDCapture.echo">echo</a></code></li>
+<li><code><a title="streamcapture.FDCapture.fd" href="#streamcapture.FDCapture.fd">fd</a></code></li>
+<li><code><a title="streamcapture.FDCapture.magic" href="#streamcapture.FDCapture.magic">magic</a></code></li>
+<li><code><a title="streamcapture.FDCapture.pipe_read_fd" href="#streamcapture.FDCapture.pipe_read_fd">pipe_read_fd</a></code></li>
+<li><code><a title="streamcapture.FDCapture.pipe_write_fd" href="#streamcapture.FDCapture.pipe_write_fd">pipe_write_fd</a></code></li>
 <li><code><a title="streamcapture.FDCapture.printer" href="#streamcapture.FDCapture.printer">printer</a></code></li>
+<li><code><a title="streamcapture.FDCapture.thread" href="#streamcapture.FDCapture.thread">thread</a></code></li>
+<li><code><a title="streamcapture.FDCapture.write" href="#streamcapture.FDCapture.write">write</a></code></li>
+<li><code><a title="streamcapture.FDCapture.writer" href="#streamcapture.FDCapture.writer">writer</a></code></li>
 </ul>
 </li>
 <li>
 <h4><code><a title="streamcapture.StreamCapture" href="#streamcapture.StreamCapture">StreamCapture</a></code></h4>
 <ul class="">
 <li><code><a title="streamcapture.StreamCapture.close" href="#streamcapture.StreamCapture.close">close</a></code></li>
+<li><code><a title="streamcapture.StreamCapture.fdcapture" href="#streamcapture.StreamCapture.fdcapture">fdcapture</a></code></li>
+<li><code><a title="streamcapture.StreamCapture.monkeypatch" href="#streamcapture.StreamCapture.monkeypatch">monkeypatch</a></code></li>
+<li><code><a title="streamcapture.StreamCapture.oldwrite" href="#streamcapture.StreamCapture.oldwrite">oldwrite</a></code></li>
+<li><code><a title="streamcapture.StreamCapture.stream" href="#streamcapture.StreamCapture.stream">stream</a></code></li>
 </ul>
 </li>
 <li>
 <h4><code><a title="streamcapture.Writer" href="#streamcapture.Writer">Writer</a></code></h4>
-<ul class="">
+<ul class="two-column">
 <li><code><a title="streamcapture.Writer.close" href="#streamcapture.Writer.close">close</a></code></li>
+<li><code><a title="streamcapture.Writer.count" href="#streamcapture.Writer.count">count</a></code></li>
+<li><code><a title="streamcapture.Writer.increment" href="#streamcapture.Writer.increment">increment</a></code></li>
+<li><code><a title="streamcapture.Writer.lock" href="#streamcapture.Writer.lock">lock</a></code></li>
 <li><code><a title="streamcapture.Writer.locked_write" href="#streamcapture.Writer.locked_write">locked_write</a></code></li>
+<li><code><a title="streamcapture.Writer.stream" href="#streamcapture.Writer.stream">stream</a></code></li>
 <li><code><a title="streamcapture.Writer.write_from" href="#streamcapture.Writer.write_from">write_from</a></code></li>
 <li><code><a title="streamcapture.Writer.writer_open" href="#streamcapture.Writer.writer_open">writer_open</a></code></li>
 </ul>
@@ -648,7 +702,7 @@ reaches <code>0</code>, <code>stream.close()</code> is called.</p></div>
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
 </footer>
 </body>
 </html>
